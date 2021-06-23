@@ -4,8 +4,13 @@ library(shiny)
 library(shinydashboard)
 
 # User interface ----------------------------------------------------------
+
 ui <- dashboardPage(
+    
     dashboardHeader(title = "EU-EpiCap"),
+
+# UI - sidebar ------------------------------------------------------------
+
     dashboardSidebar(
         sidebarMenu(
             menuItem("About EU-EpiCap", tabName = "about", icon = icon("question-circle")), 
@@ -20,6 +25,9 @@ ui <- dashboardPage(
             menuItem("Comparison", tabName = "comparison", icon = icon("copy"))
             )
     ),
+
+# UI - body ---------------------------------------------------------------
+
     dashboardBody(
         tabItems(
             tabItem(tabName = "about",
@@ -61,8 +69,11 @@ ui <- dashboardPage(
 
 
 # Server ------------------------------------------------------------------
+
 server <- function(input, output) {
-    
+ 
+    ### tabName "upload" --- upload completed questionnaire as csv file, display as table
+       
     datafile <- csvFileServer("datafile", stringsAsFactors = FALSE)
     output$table <- renderDataTable(datafile())
     
