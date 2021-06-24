@@ -157,6 +157,9 @@ server <- function(input, output) {
     datafile <- csvFileServer("datafile", stringsAsFactors = FALSE)
     output$table <- renderDataTable(datafile())
     
+    # Don't display as table (too many fields) - but update all questionnaire inputs to values from file.
+    # See https://www.r-bloggers.com/2020/12/bookmarking-a-shiny-app-without-shiny-bookmarking/
+    # See https://mastering-shiny.org/action-dynamic.html?q=update#updating-inputs
 }
 
 shinyApp(ui, server)
