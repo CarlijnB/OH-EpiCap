@@ -137,15 +137,15 @@ ui <- dashboardPage(
             ),       
             tabItem(tabName = "organization",
                     h2("Dimension 1: Organization"),
-                    apply(questions1,1,function(x){do.call(x[['inputType']],args=append(list(inputId = x[['inputId']], label= x[['label']]), eval(parse(text=x[['options']]))))}) #turns questions1 with questions/answers into inputs
+                    apply(questions1,1,function(x){do.call(x[['inputType']],args=append(list(inputId = x[['inputId']], label= x[['label']], width='80%'), eval(parse(text=x[['options']]))))}) #turns questions1 with questions/answers into inputs
             ),
             tabItem(tabName = "operations",
                     h2("Dimension 2: Operations"),
-                    apply(questions2,1,function(x){do.call(x[['inputType']],args=append(list(inputId = x[['inputId']], label= x[['label']]), eval(parse(text=x[['options']]))))}) #turns questions2 with questions/answers into inputs
+                    apply(questions2,1,function(x){do.call(x[['inputType']],args=append(list(inputId = x[['inputId']], label= x[['label']], width='80%'), eval(parse(text=x[['options']]))))}) #turns questions2 with questions/answers into inputs
             ),
             tabItem(tabName = "impact",
                     h2("Dimension 3: Impact"),
-                    apply(questions3,1,function(x){do.call(x[['inputType']],args=append(list(inputId = x[['inputId']], label= x[['label']]), eval(parse(text=x[['options']]))))}) #turns questions3 with questions/answers into inputs
+                    apply(questions3,1,function(x){do.call(x[['inputType']],args=append(list(inputId = x[['inputId']], label= x[['label']], width='80%'), eval(parse(text=x[['options']]))))}) #turns questions3 with questions/answers into inputs
             ),
             tabItem(tabName = "results",
                     h2("Visualise your EU-EpiCap profile here")
