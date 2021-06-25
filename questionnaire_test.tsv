@@ -1,0 +1,7 @@
+inputId	label	inputType	options
+Q1.1.1a	foo bar1?	sliderInput	list(value = 3, min = 1, max = 5)
+Q1.1.1b	foo bar1 relevant?	checkboxInput	list(value = TRUE)
+Q1.1.1b	foo bar2	checkboxInput	list(value = FALSE)
+Q1.1.3	foo bar3	checkboxGroupInput	list(choiceNames = c('foo1','foo2','N/A'), choiceValues = c('bar1','bar2','N/A'), inline = TRUE)
+Q1.1.4	foo bar4	radioButtons	list(choiceNames = c('foo1','foo2','N/A'), choiceValues = c('bar1','bar2','N/A'), inline = FALSE)
+Q1.1.5	foo bar5	selectInput	list(choices = c('foo','bar','N/A'), selected = 'foo', multiple = FALSE)

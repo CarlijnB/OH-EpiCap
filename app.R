@@ -3,6 +3,11 @@
 library(shiny)
 library(shinydashboard)
 
+### load in questionnaires
+questions1 <- read.delim("questionnaire_test.tsv")
+questions2 <- questions1
+questions3 <- questions1
+
 # User interface ----------------------------------------------------------
 
 ui <- dashboardPage(
@@ -38,9 +43,11 @@ ui <- dashboardPage(
     
 # UI - Header CSS ---------------------------------------------------------------
     
-#from https://jonkatz2.github.io/2018/06/22/Image-In-Shinydashboard-Header - needs changing to have figure to left and text taking up rest of column
-#also for changing colours of elements, see https://stackoverflow.com/questions/31711307/how-to-change-color-in-shiny-dashboard
-    
+# From https://jonkatz2.github.io/2018/06/22/Image-In-Shinydashboard-Header - needs changing to have figure to left and text taking up rest of column
+# For changing colours of elements, see https://stackoverflow.com/questions/31711307/how-to-change-color-in-shiny-dashboard
+
+# Do we want the original header bar with the icon to hide the sidebar at all? Remove this?   
+
     dashboardBody(
         
         tags$style(type="text/css", "
@@ -130,12 +137,15 @@ ui <- dashboardPage(
             ),       
             tabItem(tabName = "organization",
                     h2("Dimension 1: Organization"),
+                    apply(questions1,1,function(x){do.call(x[['inputType']],args=append(list(inputId = x[['inputId']], label= x[['label']]), eval(parse(text=x[['options']]))))}) #turns questions1 with questions/answers into inputs
             ),
             tabItem(tabName = "operations",
                     h2("Dimension 2: Operations"),
+                    apply(questions2,1,function(x){do.call(x[['inputType']],args=append(list(inputId = x[['inputId']], label= x[['label']]), eval(parse(text=x[['options']]))))}) #turns questions2 with questions/answers into inputs
             ),
             tabItem(tabName = "impact",
                     h2("Dimension 3: Impact"),
+                    apply(questions3,1,function(x){do.call(x[['inputType']],args=append(list(inputId = x[['inputId']], label= x[['label']]), eval(parse(text=x[['options']]))))}) #turns questions3 with questions/answers into inputs
             ),
             tabItem(tabName = "results",
                     h2("Visualise your EU-EpiCap profile here")
@@ -160,6 +170,8 @@ server <- function(input, output) {
     # Don't display as table (too many fields) - but update all questionnaire inputs to values from file.
     # See https://www.r-bloggers.com/2020/12/bookmarking-a-shiny-app-without-shiny-bookmarking/
     # See https://mastering-shiny.org/action-dynamic.html?q=update#updating-inputs
+    
+    
 }
 
 shinyApp(ui, server)
