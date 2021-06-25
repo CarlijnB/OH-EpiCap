@@ -1,7 +1,7 @@
 inputId	label	inputType	options
-Q1.1.1a	foo bar1?	sliderInput	list(value = 3, min = 1, max = 5)
-Q1.1.1b	foo bar1 relevant?	checkboxInput	list(value = TRUE)
-Q1.1.1b	foo bar2	checkboxInput	list(value = FALSE)
-Q1.1.3	foo bar3	checkboxGroupInput	list(choiceNames = c('foo1','foo2','N/A'), choiceValues = c('bar1','bar2','N/A'), inline = TRUE)
-Q1.1.4	foo bar4	radioButtons	list(choiceNames = c('foo1','foo2','N/A'), choiceValues = c('bar1','bar2','N/A'), inline = FALSE)
-Q1.1.5	foo bar5	selectInput	list(choices = c('foo','bar','N/A'), selected = 'foo', multiple = FALSE)
+Q1.11	Is the objective of the OHS system based on actors’ expectations towards integrated surveillance?	sliderInput	"list(value = 3, min = 1, max = 5)"
+Q1.12a	What information is provided in the official documentation of the OHS system? 	checkboxGroupInput	"list(choiceNames = c('Clearly stated objectives','Actors involved and their role in governance','List of members of the steering committee and their responsibilities', 'Modalities of organization and functioning of the collaboration, at any step of surveillance', 'Mechanisms for allocation of financial, human and material resources to collaboration'), choiceValues = c('bar1','bar2','bar3','bar4','bar5'), inline = FALSE)"
+Q1.12b	Is the official documentation shared among all actors of the system?	checkboxInput	list(value = FALSE)
+Q1.13	Is the OHS system leadership:	checkboxGroupInput	"list(choiceNames = c('Clear?','Shared between sectors?','Shared between disciplines?', 'Operational? (e.g. regular meetings, participation, active production of guidance)'), choiceValues = c('bar1','bar2','bar3','bar4'), inline = TRUE)"
+Q1.1.4	foo bar4	radioButtons	"list(choiceNames = c('foo1','foo2','N/A'), choiceValues = c('bar1','bar2','N/A'), inline = TRUE)"
+Q1.1.5	foo bar5	selectInput	"list(choices = c('foo','bar','N/A'), selected = 'foo', multiple = FALSE)"
