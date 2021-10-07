@@ -73,8 +73,10 @@ questionnaire2Commands <- function(questionnaire) {
 #   (2) Indicator question + notes in normal text  -  command: p(), arguments: question
 #   (3) Radiobuttons  -  command: radioButtons(), arguments: rb_args
 
-  #Combine "ID" and "Options" columns into a list of arguments for the radioButtons command
-  questionnaire <- within(questionnaire,Rb_args<-paste0('list(inputId = "Q',ID,'", label = NULL, width = "100%", choices=',Options,')'))
+  #Add column with values of the options (NA,1,2,3,4 - as strings)
+  questionnaire$Values<-lapply(questionnaire$Options,function(x) {sub(pattern = "\\..+$","",x,fixed=FALSE)})
+  #Combine "ID", "Options", and "Values" columns into a list of arguments for the radioButtons command
+  questionnaire <- within(questionnaire,Rb_args<-paste0('list(inputId = "Q',ID,'", label = NULL, width = "100%", choiceNames=',Options,', choiceValues=',Values,')'))
   #Add "list()" to ID+Indicators, and to Questions, to make argument lists for do.call
   questionnaire <- within(questionnaire,Indicator<-paste0('list("',ID,' ',Indicators,'")'))
   questionnaire <- within(questionnaire,Question<-paste0('list("',`Questions `,'")'))

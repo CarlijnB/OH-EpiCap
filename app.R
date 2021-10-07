@@ -137,6 +137,7 @@ ui <- dashboardPage(
             tabItem(tabName = "organization",
                     h2("Dimension 1: Organization"),
                     apply(commands,1,function(x){do.call(x[['Command']],args=eval(parse(text=x[['Arguments']])))})
+                    #access questionnaire input value via input$Q1.11 etc. -> need to convert to number, or set numeric value for questionnaire input
             ),
             tabItem(tabName = "operations",
                     h2("Dimension 2: Operations"),
@@ -167,8 +168,7 @@ server <- function(input, output) {
     # Don't display as table (too many fields) - but update all questionnaire inputs to values from file.
     # See https://www.r-bloggers.com/2020/12/bookmarking-a-shiny-app-without-shiny-bookmarking/
     # See https://mastering-shiny.org/action-dynamic.html?q=update#updating-inputs
-    
-    
+   
 }
 
 shinyApp(ui, server)
