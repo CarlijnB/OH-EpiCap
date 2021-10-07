@@ -4,14 +4,20 @@ library(tidyxl)
 library(unpivotr)
 library(Rcpp)
 
-#This file contains 2 functions that together turn an Excel-format questionnaire, 
-#into a df with commands to build the content for the Questionnaire pages on the EU-EpiCap app
+#This file contains 4 functions that deal with the questionnaire:
+#- readQuestionnaire() reads an Excel-format questionnaire into a usable df
+#- questionnaire2Commands() turns the questionnaire df into a df with commands to build the content for the Questionnaire pages on the EU-EpiCap app.
+#- buildQuestionnaireUI() runs the commands df, and thus builds the Questionnaire pages
+#- addScores2Questionnaire() extracts the values selected in the questionnaire and adds these to a reactive version of the questionnaire df
+
+
+# readQuestionnaire -------------------------------------------------------
+
+# This function turns the Excel-format questionnaire (single sheet) into a usable dataframe using
+# code ideas from https://nacnudus.github.io/spreadsheet-munging-strategies/
 
 readQuestionnaire <- function(datafile) {
-  
-  # This function turns the Excel-format questionnaire (single sheet) into a usable dataframe using
-  # code ideas from https://nacnudus.github.io/spreadsheet-munging-strategies/
-  
+
   #Read the xlsx data from 1st sheet into an R tibble / dataframe
   questionnaire <- xlsx_cells(datafile, sheets=1) %>% #1st sheet only
     dplyr::filter(!is_blank) %>%
@@ -65,14 +71,17 @@ readQuestionnaire <- function(datafile) {
   return(questionnaire)
 }
 
-questionnaire2Commands <- function(questionnaire) {
-  
+
+# questionnaire2Commands --------------------------------------------------
+
 # This function turns the questionnaire df into a commands df for the Shiny app.
 # The new df alternates commands to generate:
 #   (1) Indicator number + name in bold text  -  command: strong(), arguments: paste0(id, indicator)
 #   (2) Indicator question + notes in normal text  -  command: p(), arguments: question
 #   (3) Radiobuttons  -  command: radioButtons(), arguments: rb_args
 
+questionnaire2Commands <- function(questionnaire) {
+  
   #Add column with values of the options (NA,1,2,3,4 - as strings)
   questionnaire$Values<-lapply(questionnaire$Options,function(x) {sub(pattern = "\\..+$","",x,fixed=FALSE)})
   #Combine "ID", "Options", and "Values" columns into a list of arguments for the radioButtons command
@@ -89,3 +98,33 @@ questionnaire2Commands <- function(questionnaire) {
   
   return(commands)
 }
+
+
+
+# buildQuestionnaireUI ----------------------------------------------------
+
+# This function builds the questionnaire UI (text and input devices) from the 'commands' dataframe
+
+buildQuestionnaireUI <- function(commands) {
+     apply(commands,1,function(x){do.call(x[['Command']],args=eval(parse(text=x[['Arguments']])))})
+}
+
+
+
+# addScores2Questionnaire -------------------------------------------------
+
+# This function extracts questionnaire choices, and adds them to the questionnaire dataframe as column "Chosen_value" 
+
+addScores2Questionnaire <- function(input, questionnaire) {
+
+    q_values <- reactive({
+    sapply(grep(pattern="Q[[:digit:]]", x=names(input), value=TRUE), function(x) input[[x]])
+    })
+  
+  reactive({
+    cbind(
+      questionnaire,
+      Chosen_value = q_values()[sort(names(q_values()))] #N.B. Chosen_value contains characters!
+      )
+    })
+  }
