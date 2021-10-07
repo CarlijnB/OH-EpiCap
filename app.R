@@ -137,7 +137,6 @@ ui <- dashboardPage(
             tabItem(tabName = "organization",
                     h2("Dimension 1: Organization"),
                     apply(commands,1,function(x){do.call(x[['Command']],args=eval(parse(text=x[['Arguments']])))})
-                    #access questionnaire input value via input$Q1.11 etc. -> need to convert to number, or set numeric value for questionnaire input
             ),
             tabItem(tabName = "operations",
                     h2("Dimension 2: Operations"),
@@ -169,6 +168,12 @@ server <- function(input, output) {
     # See https://www.r-bloggers.com/2020/12/bookmarking-a-shiny-app-without-shiny-bookmarking/
     # See https://mastering-shiny.org/action-dynamic.html?q=update#updating-inputs
    
+    
+    ### extracting questionnaire choices, and adding them to the questionnaire dataframe in col "Chosen_value"
+    #N.B. Chosen_value contains characters!
+    questionnaire_w_values <- reactive({cbind(questionnaire, Chosen_value = q_values()[sort(names(q_values()))])})
+    q_values <- reactive({sapply(grep(pattern="Q[[:digit:]]", x=names(input), value=TRUE), function(x) input[[x]])})
+    
 }
 
 shinyApp(ui, server)
