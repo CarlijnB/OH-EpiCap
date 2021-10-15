@@ -4,11 +4,10 @@ library(tidyxl)
 library(unpivotr)
 library(Rcpp)
 
-#This file contains 4 functions that deal with the questionnaire:
+#This file contains 3 functions that build the questionnaire pages:
 #- readQuestionnaire() reads an Excel-format questionnaire into a usable df
 #- questionnaire2Commands() turns the questionnaire df into a df with commands to build the content for the Questionnaire pages on the EU-EpiCap app.
 #- buildQuestionnaireUI() runs the commands df, and thus builds the Questionnaire pages
-#- addScores2Questionnaire() extracts the values selected in the questionnaire and adds these to a reactive version of the questionnaire df
 
 
 # readQuestionnaire -------------------------------------------------------
@@ -109,22 +108,3 @@ buildQuestionnaireUI <- function(commands) {
      apply(commands,1,function(x){do.call(x[['Command']],args=eval(parse(text=x[['Arguments']])))})
 }
 
-
-
-# addScores2Questionnaire -------------------------------------------------
-
-# This function extracts questionnaire choices, and adds them to the questionnaire dataframe as column "Chosen_value" 
-
-addScores2Questionnaire <- function(input, questionnaire) {
-
-    q_values <- reactive({
-    sapply(grep(pattern="Q[[:digit:]]", x=names(input), value=TRUE), function(x) input[[x]])
-    })
-  
-  reactive({
-    cbind(
-      questionnaire,
-      Chosen_value = q_values()[sort(names(q_values()))] #N.B. Chosen_value contains characters!
-      )
-    })
-  }

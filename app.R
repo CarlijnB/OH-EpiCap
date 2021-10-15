@@ -145,7 +145,9 @@ ui <- dashboardPage(
                     h2("Dimension 3: Impact"),
             ),
             tabItem(tabName = "results",
-                    h2("Visualise your EU-EpiCap profile here")
+                    h2("Visualise your EU-EpiCap profile here"),
+                    girafeOutput("radar_all"),
+                    girafeOutput("radar_1")
             ),
             tabItem(tabName = "comparison",
                     h2("Compare multiple EU-EpiCap profiles here")
@@ -168,9 +170,18 @@ server <- function(input, output) {
     # See https://www.r-bloggers.com/2020/12/bookmarking-a-shiny-app-without-shiny-bookmarking/
     # See https://mastering-shiny.org/action-dynamic.html?q=update#updating-inputs
    
-    ### extracting questionnaire choices, and adding them to the questionnaire dataframe
+    ### scoring the questionnaire & plotting
+    # extracting questionnaire choices, and adding them to the questionnaire dataframe
     questionnaire_w_values <- addScores2Questionnaire(input,questionnaire)  #N.B. Chosen_value contains characters!
-
+    questionnaire_w_values_3<-reactive(rbind(questionnaire_w_values(),dupl_questionnaire(questionnaire_w_values(),2),dupl_questionnaire(questionnaire_w_values(),3)))
+    # summarising scores for all dimensions and for specific dimensions
+    scores_alldimensions<-reactive(scoringTable(questionnaire_w_values_3(),"all"))
+    scores_dim1<-reactive(scoringTable(questionnaire_w_values_3(),"1"))
+    scores_dim2<-reactive(scoringTable(questionnaire_w_values_3(),"2"))
+    scores_dim3<-reactive(scoringTable(questionnaire_w_values_3(),"3"))
+    output$"radar_all" <- renderGirafe(makeRadarPlot(scores_alldimensions(),3))
+    output$"radar_1" <- renderGirafe(makeRadarPlot(scores_dim1(),4))
+    
 }
 
 shinyApp(ui, server)
