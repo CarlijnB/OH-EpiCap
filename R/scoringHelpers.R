@@ -1,6 +1,6 @@
 #This file contains functions that score the completed questionnaire and link it to the visualisations
 #- addScores2Questionnaire() extracts the values selected in the questionnaire and adds these to a reactive version of the questionnaire df
-
+#- scoringTable() creates scoring tables (summarises questionnaire_w_values) for use in plotting
 
 # To test these functions, start out with these lines:
 questionnaire_w_values <- readQuestionnaire("data/Questionnaire_db_test.xlsx")
@@ -38,6 +38,8 @@ addScores2Questionnaire <- function(input, questionnaire) {
 
 
 # scoringTable ------------------------------------------------------------
+
+# Need to fix so generates either a plot or an informative error message when questions not completed!
 
 # This function creates scoring tables for use in plotting.
 # If dimension = "all", it summarises the questionnaire df by target: it sums the scores, and generates tooltip texts with score breakdowns
