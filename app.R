@@ -10,6 +10,18 @@ questionnaire <- readQuestionnaire("data/Questionnaire_db_test.xlsx")
 #Turn questionnaire df into commands that will build questionnaire pages in App
 commands <- questionnaire2Commands(questionnaire) 
 
+
+#function to show content for menuItem when menuSubItems exist (from https://newbedev.com/show-content-for-menuitem-when-menusubitems-exist-in-shiny-dashboard)
+convertMenuItem <- function(mi,tabName) {
+    mi$children[[1]]$attribs['data-toggle']="tab"
+    mi$children[[1]]$attribs['data-value'] = tabName
+    if(length(mi$attribs$class)>0 && mi$attribs$class=="treeview"){
+        mi$attribs$class=NULL
+    }
+    mi
+}
+
+
 # User interface ----------------------------------------------------------
 
 ui <- dashboardPage(
@@ -33,11 +45,23 @@ ui <- dashboardPage(
             menuItem("About EU-EpiCap", tabName = "about", icon = icon("question-circle")), 
             menuItem("Your surveillance network", tabName = "network", icon = icon("project-diagram")),
             menuItem("Questionnaire", tabName = "questionnaire", icon = icon("file-alt"),
-                     menuSubItem("Instructions", tabName = "instructions"),
-                     menuSubItem("Upload completed questionnaire", tabName = "upload"),
-                     menuSubItem("Dimension 1: Organization", tabName = "organization"),
-                     menuSubItem("Dimension 2: Operations", tabName = "operations"),
-                     menuSubItem("Dimension 3: Impact", tabName = "impact")),
+                     menuItem("Instructions", tabName = "instructions"),
+                     menuItem("Upload completed questionnaire", tabName = "upload"),
+                     convertMenuItem(menuItem("Dimension 1: Organization", tabName = "organization",
+                              menuSubItem("Target 1.1", href="#T1.1",newtab=FALSE),
+                              menuSubItem("Target 1.2", href="#T1.2",newtab=FALSE),
+                              menuSubItem("Target 1.3", href="#T1.3",newtab=FALSE),
+                              menuSubItem("Target 1.4", href="#T1.4",newtab=FALSE)),"organization"),
+                     convertMenuItem(menuItem("Dimension 2: Operations", tabName = "operations",
+                              menuSubItem("Target 2.1", href="#T2.1",newtab=FALSE),
+                              menuSubItem("Target 2.2", href="#T2.2",newtab=FALSE),
+                              menuSubItem("Target 2.3", href="#T2.3",newtab=FALSE),
+                              menuSubItem("Target 2.4", href="#T2.4",newtab=FALSE)),"operations"),
+                     convertMenuItem(menuItem("Dimension 3: Impact", tabName = "impact",
+                              menuSubItem("Target 3.1", href="#T3.1",newtab=FALSE),
+                              menuSubItem("Target 3.2", href="#T3.2",newtab=FALSE),
+                              menuSubItem("Target 3.3", href="#T3.3",newtab=FALSE),
+                              menuSubItem("Target 3.4", href="#T3.4",newtab=FALSE)),"impact")),
             menuItem("Results", tabName = "results", icon = icon("chart-pie")),
             menuItem("Comparison", tabName = "comparison", icon = icon("copy"))
         )
