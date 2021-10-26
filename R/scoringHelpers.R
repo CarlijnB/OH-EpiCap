@@ -5,6 +5,8 @@
 # To test these functions, start out with these lines:
 questionnaire_w_values <- readQuestionnaire("data/Questionnaire_db_test.xlsx")
 questionnaire_w_values$Chosen_value <- as.character(sample(1:4,16,replace=TRUE))
+questionnaire_w_values$Comment <- (sample(c("a","b",""),16,replace=TRUE))
+
 
 dupl_questionnaire <- function(questionnaire,n){
   questionnaire2 <- questionnaire
@@ -28,10 +30,16 @@ addScores2Questionnaire <- function(input, questionnaire) {
     sapply(grep(pattern="Q[[:digit:]]", x=names(input), value=TRUE), function(x) input[[x]])
   })
   
+  comments <- reactive({
+    sapply(grep(pattern="C[[:digit:]]", x=names(input), value=TRUE), function(x) input[[x]]) %>%
+      gsub(pattern="^(.+)$",replacement="\n Added comment(s):\n'\\1'")
+  })
+  
   reactive({
     cbind(
       questionnaire,
-      Chosen_value = q_values()[sort(names(q_values()))] #N.B. Chosen_value contains characters!
+      Chosen_value = q_values()[sort(names(q_values()))], #N.B. Chosen_value contains characters!
+      Comment = comments()[sort(names(comments()))]
     )
   })
 }
@@ -43,7 +51,7 @@ addScores2Questionnaire <- function(input, questionnaire) {
 
 # This function creates scoring tables for use in plotting.
 # If dimension = "all", it summarises the questionnaire df by target: it sums the scores, and generates tooltip texts with score breakdowns
-# If dimension = 1,2,3 or character equivalents, it filters the indicator scores that are part of the selected dimension,and generates tooltip texts that correspond to the selected questionnaire option
+# If dimension = 1,2,3 or character equivalents, it filters the indicator scores that are part of the selected dimension,and generates tooltip texts that correspond to the selected questionnaire option + any comments
 
 scoringTable <- function(questionnaire_w_values, dimension) {
   
@@ -64,7 +72,9 @@ scoringTable <- function(questionnaire_w_values, dimension) {
       filter(grepl(as.character(dimension), Dimension, fixed=TRUE)) %>% #filters rows for one particular dimension
       mutate(variable = paste(ID,Indicators),
              value = as.numeric(Chosen_value),
-             tooltip = str_match(Options,paste(Chosen_value,'\\. *([^"]+)\\"',sep=''))[,2]) %>%
+             tooltip = paste0(str_match(Options,paste(Chosen_value,'\\. *([^"]+)\\"',sep=''))[,2],
+                             '\n',
+                             Comment)) %>%
       select(variable, value, tooltip) %>%
       mutate(x=c(seq(9,81,24),seq(99,171,24),seq(189,261,24),seq(279,351,24)))
     

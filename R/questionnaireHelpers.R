@@ -89,12 +89,14 @@ questionnaire2Commands <- function(questionnaire) {
   questionnaire <- within(questionnaire,Indicator<-paste0('list("',ID,' ',Indicators,'")'))
   questionnaire <- within(questionnaire,Question<-paste0('list("',`Questions `,'")'))
   questionnaire <- within(questionnaire,Target<-paste0('list(id=paste0("T","',str_match(Target,"\\d\\.\\d"),'"),h3("',Target,'"))'))
+  #Add option to comment (textInput) for each indicator
+  questionnaire <- within(questionnaire,Comment_box<-paste0('list(inputId = "C',ID,'", label = NULL, placeholder = "Type here any comments to supplement your answer", width = "100%")'))
   
   #Make commands df: Extract Indicator, Question and Rb_args columns; rename cols; turn into "long matrix" format
   commands <-
-    questionnaire[c("Target","Indicator","Question","Rb_args")] %>%
-    `colnames<-`(c("div","strong","p","radioButtons")) %>%  
-    pivot_longer(cols=c(1,2,3,4),names_to="Command",values_to="Arguments") %>%
+    questionnaire[c("Target","Indicator","Question","Rb_args","Comment_box")] %>%
+    `colnames<-`(c("div","strong","p","radioButtons","textInput")) %>%  
+    pivot_longer(cols=c(1,2,3,4,5),names_to="Command",values_to="Arguments") %>%
     unique() #to remove duplicate Target rows (want to display these only once)
   
   return(commands)
