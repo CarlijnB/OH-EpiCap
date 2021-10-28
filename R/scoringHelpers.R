@@ -27,7 +27,7 @@ questionnaire_w_values<-rbind(questionnaire_w_values,dupl_questionnaire(question
 addScores2Questionnaire <- function(input, questionnaire) {
   
   q_values <- reactive({
-    sapply(grep(pattern="Q[[:digit:]]", x=names(input), value=TRUE), function(x) input[[x]])
+    sapply(grep(pattern="Q[[:digit:]]", x=names(input), value=TRUE), function(x) as.numeric(input[[x]]))
   })
   
   comments <- reactive({
@@ -38,7 +38,7 @@ addScores2Questionnaire <- function(input, questionnaire) {
   reactive({
     cbind(
       questionnaire,
-      Chosen_value = q_values()[sort(names(q_values()))], #N.B. Chosen_value contains characters!
+      Chosen_value = q_values()[sort(names(q_values()))], 
       Comment = comments()[sort(names(comments()))]
     )
   })
@@ -60,7 +60,7 @@ scoringTable <- function(questionnaire_w_values, dimension) {
   if(dimension == "all"){
     target_scores <- summarise(group_by(questionnaire_w_values,
                                         variable=Target),
-                               value = sum(as.numeric(Chosen_value)),
+                               value = sum(Chosen_value,na.rm=TRUE),
                                tooltip = paste(ID,Indicators,"-",Chosen_value,collapse="\n")) %>%
       mutate(x=seq(15,345,30))
     
@@ -71,7 +71,7 @@ scoringTable <- function(questionnaire_w_values, dimension) {
     target_scores <- questionnaire_w_values %>%
       filter(grepl(as.character(dimension), Dimension, fixed=TRUE)) %>% #filters rows for one particular dimension
       mutate(variable = paste(ID,Indicators),
-             value = as.numeric(Chosen_value),
+             value = Chosen_value,
              tooltip = paste0(str_match(Options,paste(Chosen_value,'\\. *([^"]+)\\"',sep=''))[,2],
                              '\n',
                              Comment)) %>%
