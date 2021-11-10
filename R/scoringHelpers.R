@@ -3,21 +3,9 @@
 #- scoringTable() creates scoring tables (summarises questionnaire_w_values) for use in plotting
 
 # To test these functions, start out with these lines:
-questionnaire_w_values <- readQuestionnaire("data/Questionnaire_db_test.xlsx")
-questionnaire_w_values$Chosen_value <- as.character(sample(1:4,16,replace=TRUE))
-questionnaire_w_values$Comment <- (sample(c("a","b",""),16,replace=TRUE))
-
-
-dupl_questionnaire <- function(questionnaire,n){
-  questionnaire2 <- questionnaire
-  questionnaire2$Dimension <- gsub("1",n,questionnaire2$Dimension,fixed=TRUE)
-  questionnaire2$Target <- gsub("1.",paste(n,"."),questionnaire2$Target,fixed=TRUE)
-  questionnaire2$ID <- gsub("1.",paste(n,"."),questionnaire2$ID,fixed=TRUE)
-  return(questionnaire2)
-}
-
-questionnaire_w_values<-rbind(questionnaire_w_values,dupl_questionnaire(questionnaire_w_values,2),dupl_questionnaire(questionnaire_w_values,3))
-
+#questionnaire_w_values <- readQuestionnaire("data/EU-EpiCap_Questionnaire_21_11_30.xlsx")
+#questionnaire_w_values$Chosen_value <- as.character(sample(1:4,48,replace=TRUE))
+#questionnaire_w_values$Comment <- (sample(c("a","b",""),48,replace=TRUE))
 
 
 # addScores2Questionnaire -------------------------------------------------

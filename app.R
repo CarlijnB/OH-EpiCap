@@ -6,7 +6,9 @@ library(shinydashboard)
 # Data - EU-EpiCap questionnaire  -----------------------------------------
 
 #Read in questionnaire and turn into df
-questionnaire <- readQuestionnaire("data/Questionnaire_db_test.xlsx")
+data <- readQuestionnaire("data/EU-EpiCap_Questionnaire_21_11_30.xlsx")
+questionnaire <- data$questionnaire
+dimension_data <- data$dimension_data
 #Turn questionnaire df into commands that will build questionnaire pages in App
 commands <- questionnaire2Commands(questionnaire) 
 
@@ -160,13 +162,15 @@ ui <- dashboardPage(
             ),       
             tabItem(tabName = "organization",
                     h2("Dimension 1: Organization"),
-                    buildQuestionnaireUI(commands)
+                    buildQuestionnaireUI(commands[commands$Dimension=='Dimension 1: Organization',])
             ),
             tabItem(tabName = "operations",
                     h2("Dimension 2: Operations"),
+                    buildQuestionnaireUI(commands[commands$Dimension=='Dimension 2: Operations',])
             ),
             tabItem(tabName = "impact",
                     h2("Dimension 3: Impact"),
+                    buildQuestionnaireUI(commands[commands$Dimension=='Dimension 3: Impact ',])
             ),
             tabItem(tabName = "results",
                     h2("Visualise your EU-EpiCap profile here"),
@@ -196,13 +200,12 @@ server <- function(input, output) {
    
     ### scoring the questionnaire & plotting
     # extracting questionnaire choices, and adding them to the questionnaire dataframe
-    questionnaire_w_values <- addScores2Questionnaire(input,questionnaire)  #N.B. Chosen_value contains characters!
-    questionnaire_w_values_3<-reactive(rbind(questionnaire_w_values(),dupl_questionnaire(questionnaire_w_values(),2),dupl_questionnaire(questionnaire_w_values(),3)))
+    questionnaire_w_values <- addScores2Questionnaire(input,questionnaire)  
     # summarising scores for all dimensions and for specific dimensions
-    scores_alldimensions<-reactive(scoringTable(questionnaire_w_values_3(),"all"))
-    scores_dim1<-reactive(scoringTable(questionnaire_w_values_3(),"1"))
-    scores_dim2<-reactive(scoringTable(questionnaire_w_values_3(),"2"))
-    scores_dim3<-reactive(scoringTable(questionnaire_w_values_3(),"3"))
+    scores_alldimensions<-reactive(scoringTable(questionnaire_w_values(),"all"))
+    scores_dim1<-reactive(scoringTable(questionnaire_w_values(),"1"))
+    scores_dim2<-reactive(scoringTable(questionnaire_w_values(),"2"))
+    scores_dim3<-reactive(scoringTable(questionnaire_w_values(),"3"))
     output$"radar_all" <- renderGirafe(makeRadarPlot(scores_alldimensions(),3))
     output$"radar_1" <- renderGirafe(makeRadarPlot(scores_dim1(),4))
     
