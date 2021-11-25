@@ -2,6 +2,7 @@
 # Setup -------------------------------------------------------------------
 library(shiny)
 library(shinydashboard)
+library(shinyjs)
 
 # Data - EU-EpiCap questionnaire  -----------------------------------------
 
@@ -45,10 +46,10 @@ ui <- dashboardPage(
     dashboardSidebar(
         sidebarMenu(
             menuItem("About EU-EpiCap", tabName = "about", icon = icon("question-circle")), 
-            menuItem("Your surveillance network", tabName = "network", icon = icon("project-diagram")),
+            #menuItem("Your surveillance network", tabName = "network", icon = icon("project-diagram")),
             menuItem("Questionnaire", tabName = "questionnaire", icon = icon("file-alt"),
-                     menuItem("Instructions", tabName = "instructions"),
-                     menuItem("Upload completed questionnaire", tabName = "upload"),
+                     #menuItem("Instructions", tabName = "instructions"),
+                     menuItem("Upload answers from file", tabName = "upload"),
                      convertMenuItem(menuItem("Dimension 1: Organization", tabName = "organization",
                               menuSubItem("Target 1.1", href="#T1.1",newtab=FALSE),
                               menuSubItem("Target 1.2", href="#T1.2",newtab=FALSE),
@@ -63,9 +64,13 @@ ui <- dashboardPage(
                               menuSubItem("Target 3.1", href="#T3.1",newtab=FALSE),
                               menuSubItem("Target 3.2", href="#T3.2",newtab=FALSE),
                               menuSubItem("Target 3.3", href="#T3.3",newtab=FALSE),
-                              menuSubItem("Target 3.4", href="#T3.4",newtab=FALSE)),"impact")),
-            menuItem("Results", tabName = "results", icon = icon("chart-pie")),
-            menuItem("Comparison", tabName = "comparison", icon = icon("copy"))
+                              menuSubItem("Target 3.4", href="#T3.4",newtab=FALSE)),"impact"),
+                     menuItem("Download answers or report", tabName = "download")
+            ),
+            menuItem("Results", tabName = "results", icon = icon("chart-pie")
+            #         ),
+            #menuItem("Comparison", tabName = "comparison", icon = icon("copy")
+            )
         )
     ),
     
@@ -144,21 +149,22 @@ ui <- dashboardPage(
         tabItems(
             tabItem(tabName = "about",
                     h2("About the EU-EpiCap tool"),
-                    p("Blabla")
+                    p("The MATRIX project aims to advance the implementation of One health (OH) Surveillance in practice by building onto existing resources, adding value to them and creating synergies among the sectors at the national level."),
+                    p("Within work package four (WP4), a generic benchmarking tool (EU-EpiCap) is being developed for characterizing, monitoring and evaluating epidemiological surveillance capacities, which directly contribute to OHS. The tool aims to identify and describe the collaborations among actors involved in the surveillance of a hazard and to characterize the OH-ness of the surveillance system. The tool will support identification of areas that could lead to improvements in existing OH surveillance capacities.")
             ),
-            tabItem(tabName = "network",
-                    h2("Explore your surveillance network here")
-            ),
+            #tabItem(tabName = "network",
+            #        h2("Explore your surveillance network here")
+            #),
             tabItem(tabName = "questionnaire",
                     h2("Complete the EU-EpiCap questionnaire here"),
             ),
-            tabItem(tabName = "instructions",
-                    h2("How to complete the EU-EpiCap tool"),
-            ),
+            #tabItem(tabName = "instructions",
+            #        h2("How to complete the EU-EpiCap tool"),
+            #),
             tabItem(tabName = "upload",
-                    h2("Upload a previously completed questionnaire"),
-                    csvFileUI("datafile", "Upload EU-EpiCap profile (.csv format)"),
-                    dataTableOutput("table")
+                    h2("Upload answers from a previously (partially) completed questionnaire"),
+                    #csvFileUI("datafile", "Upload EU-EpiCap profile (.csv or .rds format)"),
+                    questionnaireUploadUI("datafile", "Upload EU-EpiCap profile (.csv or .rds format)"),
             ),       
             tabItem(tabName = "organization",
                     h2("Dimension 1: Organization"),
@@ -172,13 +178,17 @@ ui <- dashboardPage(
                     h2("Dimension 3: Impact"),
                     buildQuestionnaireUI(commands[commands$Dimension=='Dimension 3: Impact ',])
             ),
+            tabItem(tabName = "download",
+                    h2("Download selected questionnaire answers"),
+                    questionnaireDownloadUI("downloadedAnswers", "Download EU-EpiCap profile (.csv or .rds format)")
+            ),       
             tabItem(tabName = "results",
                     h2("Visualise your EU-EpiCap profile here"),
                     girafeOutput("radar_all"),
                     girafeOutput("radar_1")
-            ),
-            tabItem(tabName = "comparison",
-                    h2("Compare multiple EU-EpiCap profiles here")
+            #),
+            #tabItem(tabName = "comparison",
+            #        h2("Compare multiple EU-EpiCap profiles here")
             )
         )    
     )
@@ -187,17 +197,20 @@ ui <- dashboardPage(
 
 # Server ------------------------------------------------------------------
 
-server <- function(input, output) {
+server <- function(input, output, session) {
     
-    ### tabName "upload" --- upload completed questionnaire as csv file, display as table
+    #lists of input names associated with questions and comments
+    question_inputs <- reactive(grep(pattern="Q[[:digit:]]", x=names(input), value=TRUE))
+    comment_inputs <- reactive(grep(pattern="C[[:digit:]]", x=names(input), value=TRUE))
     
-    datafile <- csvFileServer("datafile", stringsAsFactors = FALSE)
-    output$table <- renderDataTable(datafile())
-    
-    # Don't display as table (too many fields) - but update all questionnaire inputs to values from file.
-    # See https://www.r-bloggers.com/2020/12/bookmarking-a-shiny-app-without-shiny-bookmarking/
-    # See https://mastering-shiny.org/action-dynamic.html?q=update#updating-inputs
-   
+    ### restoring questionnaire state
+    #datafile <- csvFileServer("datafile", stringsAsFactors = FALSE)
+    state<-questionnaireUploadServer("datafile", stringsAsFactors = FALSE) #from RDS file
+    observeEvent(state(),{
+        sapply(question_inputs(), function(x){updateRadioButtons(session,inputId=x,selected=state()[[x]])})
+        sapply(comment_inputs(), function(x){updateTextInput(session,inputId=x,value=state()[[x]])})
+        })
+
     ### scoring the questionnaire & plotting
     # extracting questionnaire choices, and adding them to the questionnaire dataframe
     questionnaire_w_values <- addScores2Questionnaire(input,questionnaire)  
@@ -209,6 +222,11 @@ server <- function(input, output) {
     output$"radar_all" <- renderGirafe(makeRadarPlot(scores_alldimensions(),3))
     output$"radar_1" <- renderGirafe(makeRadarPlot(scores_dim1(),4))
     
+    ### tabName "download" --- download completed questionnaire as rds or csv file
+    inputlist <- reactive({
+        sapply(c(question_inputs(),comment_inputs()), function(x) input[[x]], USE.NAMES = TRUE)
+    })
+    downloadedAnswers <- questionnaireDownloadServer("downloadedAnswers", stringsAsFactors = FALSE,inputlist=inputlist)
 }
 
 shinyApp(ui, server)
