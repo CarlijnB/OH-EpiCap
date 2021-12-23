@@ -185,7 +185,9 @@ ui <- dashboardPage(
             tabItem(tabName = "results",
                     h2("Visualise your EU-EpiCap profile here"),
                     girafeOutput("radar_all"),
-                    girafeOutput("radar_1")
+                    girafeOutput("radar_1"),
+                    girafeOutput("radar_2"),
+                    girafeOutput("radar_3")
             #),
             #tabItem(tabName = "comparison",
             #        h2("Compare multiple EU-EpiCap profiles here")
@@ -221,6 +223,8 @@ server <- function(input, output, session) {
     scores_dim3<-reactive(scoringTable(questionnaire_w_values(),"3"))
     output$"radar_all" <- renderGirafe(makeRadarPlot(scores_alldimensions(),3))
     output$"radar_1" <- renderGirafe(makeRadarPlot(scores_dim1(),4))
+    output$"radar_2" <- renderGirafe(makeRadarPlot(scores_dim2(),4))
+    output$"radar_3" <- renderGirafe(makeRadarPlot(scores_dim3(),4))
     
     ### tabName "download" --- download completed questionnaire as rds or csv file
     inputlist <- reactive({
