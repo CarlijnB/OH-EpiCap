@@ -2,10 +2,15 @@
 #Script (rewrite of ggRadar) mostly by Laurens - don't forget to acknowledge! 
 # Check rewrite from where? might need to add ref/acknowledgement
 
-
 library(tidyverse)
 library(ggiraph)
 library(ggmulti)
+
+#to test script for 4 partitions, generate dummy scoring table as follows
+#scores<-data.frame(x=c(seq(9,81,24),seq(99,171,24),seq(189,261,24),seq(279,351,24)), variable="foo",value=sample(1:4,16,replace=TRUE),tooltip="bar")
+#origin_points <- list(x=0,variable=NA,value=0,tooltip="")
+#scores_df <- rbind(origin_points,scores[1:4,],origin_points,scores[5:8,],origin_points,scores[9:12,],origin_points,scores[13:16,],make.row.names=FALSE)  
+
 
 #Create the shapes for background colouring, from origin to outer edge of the plot, for x partitions
 createBgpolygons <- function(n_partitions,max_score){
@@ -35,9 +40,9 @@ makeRadarPlot <- function(scoring_table, n_partitions){
     geom_polygon(data=bgPolygons[[1]],linetype=0,fill="#F47931",alpha=0.2)+
     geom_polygon(data=bgPolygons[[2]],linetype=0,fill="#00679C",alpha=0.2)+
     geom_polygon(data=bgPolygons[[3]],linetype=0,fill="#CECECE",alpha=0.2)+
-    geom_polygon_interactive(data=scoring_table[1:5,],colour = "#F47931", fill="#F47931", alpha = 0.7) +
-    geom_polygon_interactive(data=scoring_table[6:10,],colour = "#00679C", fill="#00679C", alpha = 0.7) + 
-    geom_polygon_interactive(data=scoring_table[11:15,],colour = "#CECECE", fill="#CECECE", alpha = 0.7) +
+    geom_polygon_interactive(data=scoring_table[1:5,][!is.na(scoring_table$value[1:5]),],colour = "#F47931", fill="#F47931", alpha = 0.7) +
+    geom_polygon_interactive(data=scoring_table[6:10,][!is.na(scoring_table$value[6:10]),],colour = "#00679C", fill="#00679C", alpha = 0.7) + 
+    geom_polygon_interactive(data=scoring_table[11:15,][!is.na(scoring_table$value[11:15]),],colour = "#CECECE", fill="#CECECE", alpha = 0.7) +
     geom_point_interactive(
       data=scoring_table[2:5,],
       mapping = aes(tooltip = tooltip),
@@ -86,7 +91,7 @@ makeRadarPlot <- function(scoring_table, n_partitions){
     if(n_partitions ==4){
       p <- p +
         geom_polygon(data=bgPolygons[[4]],linetype=0,fill="#63913E",alpha=0.2) +
-        geom_polygon_interactive(data=scoring_table[16:20,],colour = "#63913E", fill="#63913E", alpha = 0.7) +
+        geom_polygon_interactive(data=scoring_table[16:20,][!is.na(scoring_table$value[16:20]),],colour = "#63913E", fill="#63913E", alpha = 0.7) +
         geom_point_interactive(
           data=scoring_table[17:20,],
           mapping = aes(tooltip = tooltip),

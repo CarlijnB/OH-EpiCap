@@ -52,7 +52,7 @@ scoringTable <- function(questionnaire_w_values, dimension) {
                                tooltip = paste(ID,Indicators,"-",Chosen_value,collapse="\n")) %>%
       mutate(x=seq(15,345,30))
     
-    scores_df <- rbind(origin_points,target_scores[1:4,], origin_points,target_scores[5:8,], origin_points,target_scores[9:12,])                  
+    scores_df <- rbind(origin_points,target_scores[1:4,], origin_points,target_scores[5:8,], origin_points,target_scores[9:12,],make.row.names=FALSE)                  
 
   }
   else if(dimension %in% list(1,2,3,"1","2","3")) { #if dimension given as a number
@@ -66,7 +66,7 @@ scoringTable <- function(questionnaire_w_values, dimension) {
       select(variable, value, tooltip) %>%
       mutate(x=c(seq(9,81,24),seq(99,171,24),seq(189,261,24),seq(279,351,24)))
     
-    scores_df <- rbind(origin_points,target_scores[1:4,], origin_points,target_scores[5:8,], origin_points,target_scores[9:12,], origin_points,target_scores[13:16,])     
+    scores_df <- rbind(origin_points,target_scores[1:4,], origin_points,target_scores[5:8,], origin_points,target_scores[9:12,], origin_points,target_scores[13:16,],make.row.names=FALSE)     
   }
   scores_df$x <- as.numeric(scores_df$x)
   scores_df$value <- as.numeric(scores_df$value)
