@@ -27,9 +27,7 @@ createBgpolygons <- function(n_partitions,max_score){
 
 makeRadarPlot <- function(scoring_table, n_partitions){
   
-  if(n_partitions==3){
-    max_score <- 16}
-  else {max_score <- 4}
+  max_score <- 4
   
   bgPolygons<-createBgpolygons(n_partitions,max_score)
   
@@ -75,15 +73,15 @@ makeRadarPlot <- function(scoring_table, n_partitions){
       #panel.background = element_rect(fill="lightblue"),
       #plot.background = element_rect(fill="darkseagreen") #to make margins visible; REMOVE!
     ) +
-    scale_y_continuous(breaks = seq(0, max_score, by=2),limits=c(0,max_score),expand=c(0,0)) +
+    scale_y_continuous(breaks = seq(0, max_score, by=1),limits=c(0,max_score),expand=c(0,0)) +
     scale_x_continuous(breaks = seq(15, 355, by=30),
                        minor_breaks = NULL,
                        labels=str_wrap(c(scoring_table$variable[2:5],scoring_table$variable[7:10],scoring_table$variable[12:15]),width=15)) +
     annotate(
       "text",
       x = 0,
-      y = seq(0, max_score, 2),
-      label = seq(0, max_score, 2),
+      y = seq(0, max_score, 1),
+      label = seq(0, max_score, 1),
       size = 3,
       colour = "grey"
     )
@@ -98,21 +96,12 @@ makeRadarPlot <- function(scoring_table, n_partitions){
           colour = "#63913E",
           size = 3
         ) +
-        scale_y_continuous(breaks = seq(0, max_score, by=1),limits=c(0,max_score),expand=c(0,0)) +
         scale_x_continuous(breaks = c(seq(9,81,by=24),seq(99,171,by=24),seq(189,261,by=24),seq(279,351,by=24)),
                            minor_breaks = NULL,
                            labels=str_wrap(c(scoring_table$variable[2:5],
                                              scoring_table$variable[7:10],
                                              scoring_table$variable[12:15],
-                                             scoring_table$variable[17:20]),width=15))+
-        annotate(
-          "text",
-          x = 0,
-          y = seq(0, max_score, 1),
-          label = seq(0, max_score, 1),
-          size = 3,
-          colour = "grey"
-        )
+                                             scoring_table$variable[17:20]),width=15))
     }
 
   interactive <- FALSE

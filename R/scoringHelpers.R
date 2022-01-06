@@ -48,7 +48,7 @@ scoringTable <- function(questionnaire_w_values, dimension) {
   if(dimension == "all"){
     target_scores <- summarise(group_by(questionnaire_w_values,
                                         variable=Target),
-                               value = sum(Chosen_value,na.rm=TRUE),
+                               value = mean(Chosen_value,na.rm=TRUE),
                                tooltip = paste(ID,Indicators,"-",Chosen_value,collapse="\n")) %>%
       mutate(x=seq(15,345,30))
     
