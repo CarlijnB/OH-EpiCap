@@ -2,6 +2,8 @@
 #Script (rewrite of ggRadar) mostly by Laurens - don't forget to acknowledge! 
 # Check rewrite from where? might need to add ref/acknowledgement
 
+#Script slow due to rewrite of radar_coord. does it make a difference if this is called elsewhere?
+
 library(tidyverse)
 library(ggiraph)
 library(ggmulti)
@@ -196,21 +198,6 @@ makeRadarPlot <- function(scoring_table, n_partitions){
                            )
     }
 
-  interactive <- FALSE
-  if (interactive) {
-    tooltip_css <- "background-color:white;font-style:italic;padding:10px;border-radius:10px 20px 10px 20px;"
-    hover_css = "r:4px;cursor:pointer;stroke-width:6px;"
-    selected_css = "fill:#FF3333;stroke:black;"
-    p <- girafe(ggobj = p)
-    p <- girafe_options(
-      p,
-      opts_hover(css = hover_css),
-      opts_tooltip(css = tooltip_css, opacity = 0.75),
-      opts_selection(css = selected_css),
-      opts_zoom(min = 1, max = 10)
-    )
-  }
+  girafe(code = print(p))
   
-  ggiraph(code = print(p))
-
 }
