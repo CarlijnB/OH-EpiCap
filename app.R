@@ -206,8 +206,7 @@ server <- function(input, output, session) {
     comment_inputs <- reactive(grep(pattern="C[[:digit:]]", x=names(input), value=TRUE))
     
     ### restoring questionnaire state
-    #datafile <- csvFileServer("datafile", stringsAsFactors = FALSE)
-    state<-questionnaireUploadServer("datafile", stringsAsFactors = FALSE) #from RDS file
+    state<-questionnaireUploadServer("datafile", stringsAsFactors = FALSE)
     observeEvent(state(),{
         sapply(question_inputs(), function(x){updateRadioButtons(session,inputId=x,selected=state()[[x]])})
         sapply(comment_inputs(), function(x){updateTextInput(session,inputId=x,value=state()[[x]])})
