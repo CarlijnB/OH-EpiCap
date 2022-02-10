@@ -23,11 +23,9 @@ readQuestionnaire <- function(datafile) {
     select(sheet,row,col,data_type,character)
   
   #extract generic dimension data, and remove dimension text from questionnaire
-  dimension_data<-matrix(questionnaire$character[which(questionnaire$row %in% c(1,2) & questionnaire$col==1)],ncol=2,byrow=TRUE,
-                         dimnames = list(row_names=NULL,col_names=c('Dimension','Dimension_text'))) #not being used - can be removed
   questionnaire<-questionnaire[!(questionnaire$row==2 & questionnaire$col==1),]
   
-    #If "Dimension"/"Target" stated in 2nd column:    
+  #If "Dimension"/"Target" stated in 2nd column:    
   #change the column number of cells containing the word "Dimension" (or "Target") to 1 - so can "behead"
   questionnaire[grep('Dimension',x=questionnaire$character,fixed=TRUE), ]$col<-1
   questionnaire[grep('Target',x=questionnaire$character,fixed=TRUE), ]$col<-1
@@ -72,8 +70,7 @@ readQuestionnaire <- function(datafile) {
   questionnaire$Options <- strsplit(questionnaire$`Possible answers `,"\r\n")
   questionnaire <- select(questionnaire,-`Possible answers `)
 
-  return(list(dimension_data = dimension_data, #not being used - can be removed
-              questionnaire = questionnaire))
+  return(questionnaire)
 }
 
 
