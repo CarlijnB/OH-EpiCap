@@ -38,40 +38,65 @@ addScores2Questionnaire <- function(input, questionnaire) {
 # Need to fix so generates either a plot or an informative error message when questions not completed!
 
 # This function creates scoring tables for use in plotting.
-# If dimension = "all", it summarises the questionnaire df by target: it sums the scores, and generates tooltip texts with score breakdowns
-# If dimension = 1,2,3 or character equivalents, it filters the indicator scores that are part of the selected dimension,and generates tooltip texts that correspond to the selected questionnaire option + any comments
+# If level = "targets", it summarises the questionnaire df by target: it sums the scores, and generates tooltip texts with score breakdowns
+# If level = "indicators", it shows indicator values, and generates tooltip texts that correspond to the selected questionnaire option + any comments
 
-scoringTable <- function(questionnaire_w_values, dimension) {
+# The reference argument indicates use of the function to create scoring tables for a benchmark reference dataset:
+# If reference = TRUE, comments are not included, and tooltips show ... 
+
+scoringTable <- function(questionnaire_w_values, level, reference = FALSE) {
   
   origin_points <- list(x=0,variable=NA,value=0,tooltip="") # a dataframe row to represent (0,0) points with no tooltip or label
   
-  if(dimension == "all"){
+  if(level == "targets"){
     target_scores <- summarise(group_by(questionnaire_w_values,
                                         variable=Target),
                                value = mean(Chosen_value,na.rm=TRUE),
-                               tooltip = paste(ID,Indicators,"-",Chosen_value,collapse="\n")) %>%
+                               low = ifelse(reference== FALSE, NA, mean(low,na.rm=TRUE)), #review when clearer what values 
+                               high = ifelse(reference== FALSE, NA, mean(high,na.rm=TRUE)), #low and high should display
+                               tooltip = ifelse(reference == FALSE,
+                                                paste(ID,Indicators,"-",Chosen_value,collapse="\n"),
+                                                "sample tooltip for benchmark ref dataset")
+                               )%>%
       mutate(x=seq(15,345,30))
     
-    scores_df <- rbind(origin_points,target_scores[1:4,], origin_points,target_scores[5:8,], origin_points,target_scores[9:12,],make.row.names=FALSE)                  
-
+    if(reference == FALSE){
+      target_scores <- target_scores %>% select(x, variable, value, tooltip)
+      scores_df <- rbind(origin_points,target_scores[1:4,], origin_points,target_scores[5:8,], origin_points,target_scores[9:12,],make.row.names=FALSE)
+    }else{
+      scores_df <- target_scores %>% select(x, variable, value, low, high, tooltip)
+    }
   }
-  else if(dimension %in% list(1,2,3,"1","2","3")) { #if dimension given as a number
-    target_scores <- questionnaire_w_values %>%
-      filter(grepl(as.character(dimension), Dimension, fixed=TRUE)) %>% #filters rows for one particular dimension
+  
+  else if(level == "indicators") {
+    scores_df <- questionnaire_w_values %>%
       mutate(variable = paste(ID,Indicators),
              value = Chosen_value,
-             tooltip = paste0(str_match(Options,paste(Chosen_value,'\\. *([^"]+)\\"',sep=''))[,2],
-                             '\n',
-                             Comment)) %>%
-      select(variable, value, tooltip) %>%
-      mutate(x=c(seq(9,81,24),seq(99,171,24),seq(189,261,24),seq(279,351,24)))
-    
-    scores_df <- rbind(origin_points,target_scores[1:4,], origin_points,target_scores[5:8,], origin_points,target_scores[9:12,], origin_points,target_scores[13:16,],make.row.names=FALSE)     
+             x=rep(c(seq(9,81,24),seq(99,171,24),seq(189,261,24),seq(279,351,24)),3),
+             tooltip = ifelse(reference == FALSE,
+                              paste0(str_match(Options,paste(Chosen_value,'\\. *([^"]+)\\"',sep=''))[,2],'\n',Comment),
+                              "sample tooltip for benchmark ref dataset")
+             )
+    if(reference == FALSE){
+      scores_df <- scores_df %>%
+        group_by(Dimension,Target) %>%
+        group_modify(~ add_row(.x,as_tibble(origin_points),.before=0)) %>%
+        ungroup() %>%
+        select(x, variable, value, tooltip)
+    }else{
+      scores_df <- scores_df %>%
+        select(x, variable, value, low, high, tooltip)
+    }
   }
+  
   scores_df$x <- as.numeric(scores_df$x)
   scores_df$value <- as.numeric(scores_df$value)
+  if(reference==TRUE){
+    scores_df$high <- as.numeric(scores_df$high)
+    scores_df$low <- as.numeric(scores_df$low)    
+  }
+  
   return(scores_df)
-
 }
 
 

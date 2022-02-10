@@ -4,15 +4,20 @@ library(shiny)
 library(shinydashboard)
 library(shinyjs)
 
+ref_files<-list.files("data/reference_datasets", pattern=".+_ST.+") #can use tools::file_path_sans_ext() to remove extensions
+ref_datasets<-unique(sub(pattern = "_ST.+",replacement="",ref_files))
+
 # Data - EU-EpiCap questionnaire  -----------------------------------------
 
 #Read in questionnaire and turn into df
 data <- readQuestionnaire("data/EU-EpiCap_Questionnaire_21_11_30.xlsx")
 questionnaire <- data$questionnaire
-dimension_data <- data$dimension_data
+dimension_data <- data$dimension_data #not being used - can be removed
 #Turn questionnaire df into commands that will build questionnaire pages in App
 commands <- questionnaire2Commands(questionnaire) 
 
+# Basic set up for radarplots
+setupRadarPlot()
 
 #function to show content for menuItem when menuSubItems exist (from https://newbedev.com/show-content-for-menuitem-when-menusubitems-exist-in-shiny-dashboard)
 convertMenuItem <- function(mi,tabName) {
@@ -68,8 +73,8 @@ ui <- dashboardPage(
                      menuItem("Download answers or report", tabName = "download")
             ),
             menuItem("Results", tabName = "results", icon = icon("chart-pie")
-            #         ),
-            #menuItem("Comparison", tabName = "comparison", icon = icon("copy")
+                     ),
+            menuItem("Comparison", tabName = "comparison", icon = icon("copy")
             )
         )
     ),
@@ -163,7 +168,6 @@ ui <- dashboardPage(
             #),
             tabItem(tabName = "upload",
                     h2("Upload answers from a previously (partially) completed questionnaire"),
-                    #csvFileUI("datafile", "Upload EU-EpiCap profile (.csv or .rds format)"),
                     questionnaireUploadUI("datafile", "Upload EU-EpiCap profile (.csv or .rds format)"),
             ),       
             tabItem(tabName = "organization",
@@ -183,14 +187,19 @@ ui <- dashboardPage(
                     questionnaireDownloadUI("downloadedAnswers", "Download EU-EpiCap profile (.csv or .rds format)")
             ),       
             tabItem(tabName = "results",
-                    h2("Visualise your EU-EpiCap profile here"),
+                    h2("Visualise your EU-EpiCap profile"),
                     girafeOutput("radar_all"),
                     girafeOutput("radar_1"),
                     girafeOutput("radar_2"),
                     girafeOutput("radar_3")
-            #),
-            #tabItem(tabName = "comparison",
-            #        h2("Compare multiple EU-EpiCap profiles here")
+            ),
+            tabItem(tabName = "comparison",
+                    h2("Compare your EU-EpiCap profile to a reference dataset"),
+                    selectInput(inputId = "selected_ref", label = "Select a reference dataset",choices=c("Select a reference dataset", ref_datasets), selectize=TRUE),
+                    girafeOutput("benchmark_all"),
+                    girafeOutput("benchmark_1"),
+                    girafeOutput("benchmark_2"),
+                    girafeOutput("benchmark_3")
             )
         )    
     )
@@ -214,22 +223,32 @@ server <- function(input, output, session) {
 
     ### scoring the questionnaire & plotting
     # extracting questionnaire choices, and adding them to the questionnaire dataframe
-    questionnaire_w_values <- addScores2Questionnaire(input,questionnaire)  
-    # summarising scores for all dimensions and for specific dimensions
-    scores_alldimensions<-reactive(scoringTable(questionnaire_w_values(),"all"))
-    scores_dim1<-reactive(scoringTable(questionnaire_w_values(),"1"))
-    scores_dim2<-reactive(scoringTable(questionnaire_w_values(),"2"))
-    scores_dim3<-reactive(scoringTable(questionnaire_w_values(),"3"))
-    output$"radar_all" <- renderGirafe(makeRadarPlot(scores_alldimensions(),3))
-    output$"radar_1" <- renderGirafe(makeRadarPlot(scores_dim1(),4))
-    output$"radar_2" <- renderGirafe(makeRadarPlot(scores_dim2(),4))
-    output$"radar_3" <- renderGirafe(makeRadarPlot(scores_dim3(),4))
+    questionnaire_w_values <- addScores2Questionnaire(input,questionnaire) #by sticking everything into one df, all wrangling + plotting code has to be rerun as soon as I change 1 value 
+    # summarising scores by target for all dimensions, and by indicator for each dimension separately
+    scores_targets<-reactive(scoringTable(questionnaire_w_values(),"targets"))
+    scores_indicators<-reactive(scoringTable(questionnaire_w_values(),"indicators")) 
+    output$"radar_all" <- renderGirafe(makeRadarPlot_results(scores_targets(),3))
+    output$"radar_1" <- renderGirafe(makeRadarPlot_results(scores_indicators()[1:20,],4))
+    output$"radar_2" <- renderGirafe(makeRadarPlot_results(scores_indicators()[21:40,],4))
+    output$"radar_3" <- renderGirafe(makeRadarPlot_results(scores_indicators()[41:60,],4))
     
     ### tabName "download" --- download completed questionnaire as rds or csv file
     inputlist <- reactive({
         sapply(c(question_inputs(),comment_inputs()), function(x) input[[x]], USE.NAMES = TRUE)
     })
     downloadedAnswers <- questionnaireDownloadServer("downloadedAnswers", stringsAsFactors = FALSE,inputlist=inputlist)
-}
+
+    ### Benchmarking - make module
+    #read in reference scoring tables
+    selected_ref_files<-reactive({ref_files[which(str_detect(ref_files,input$selected_ref))]})
+    ref_targets<-reactive({read.csv(paste0("data/reference_datasets/",as.character(selected_ref_files()[which(str_detect(ref_files,"STtargets"))])))})
+    ref_indic<-reactive({read.csv(paste0("data/reference_datasets/",as.character(selected_ref_files()[which(str_detect(ref_files,"STindicators"))])))})
+    #generate radarcharts
+    output$"benchmark_all" <- renderGirafe(makeRadarPlot_benchmark(scores_targets(),3,ref_targets()))
+    output$"benchmark_1" <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[1:20,],4,ref_indic()))
+    output$"benchmark_2" <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[21:40,],4,ref_indic()))
+    output$"benchmark_3" <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[41:60,],4,ref_indic()))
+
+    }
 
 shinyApp(ui, server)

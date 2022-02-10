@@ -3,6 +3,7 @@
 # Check rewrite from where? might need to add ref/acknowledgement
 
 #Script slow due to rewrite of radar_coord. does it make a difference if this is called elsewhere?
+#Faster to have "background" radarcharts saved as rds objects, then uploaded and added to?
 
 library(tidyverse)
 library(ggiraph)
@@ -14,7 +15,7 @@ library(ggmulti)
 #scoring_table <- rbind(origin_points,scores[1:4,],origin_points,scores[5:8,],origin_points,scores[9:12,],origin_points,scores[13:16,],make.row.names=FALSE)  
 #scoring_table[2,'value']<-NA
 
-#Create the shapes for background colouring, from origin to outer edge of the plot, for x partitions
+#Function that creates the shapes for background colouring, from origin to outer edge of the plot, for x partitions
 createBgpolygons <- function(n_partitions,max_score){
   degrees_per_partition <- 360/(n_partitions+1) #90 for 3; 72 for 4
   degrees_break <- degrees_per_partition/n_partitions #in between partitions
@@ -27,7 +28,7 @@ createBgpolygons <- function(n_partitions,max_score){
     }))
 }
 
-#Rewrite of radar_coord to remove the extra outer circle
+#Rewrite of radar_coord function, but this one removes the extra outer circle from the radarchart
 #from: https://stackoverflow.com/questions/36579767/add-unit-labels-to-radar-plot-and-remove-outer-ring-ggplot2-spider-web-plot-co
 coord_radar <- function (theta = "x", start = 0, direction = 1){
   theta <- match.arg(theta, c("x", "y"))
@@ -100,44 +101,11 @@ coord_radar <- function (theta = "x", start = 0, direction = 1){
           })
 }
 
-#Main function, to create a radar chart from a scoring table
-makeRadarPlot <- function(scoring_table, n_partitions){
-  
-  max_score <- 4
-  
-  bgPolygons<-createBgpolygons(n_partitions,max_score)
-  
-  p <- ggplot(
-    data = scoring_table,
-    mapping = aes(x = x, y = value, group = 1)
-  ) +
-    geom_polygon(data=bgPolygons[[1]],linetype=0,fill="#F47931",alpha=0.2)+
-    geom_polygon(data=bgPolygons[[2]],linetype=0,fill="#00679C",alpha=0.2)+
-    geom_polygon(data=bgPolygons[[3]],linetype=0,fill="#CECECE",alpha=0.2)+
-    geom_polygon_interactive(data=scoring_table[1:5,][!is.na(scoring_table$value[1:5]),],colour = "#F47931", fill="#F47931", alpha = 0.7) +
-    geom_polygon_interactive(data=scoring_table[6:10,][!is.na(scoring_table$value[6:10]),],colour = "#00679C", fill="#00679C", alpha = 0.7) + 
-    geom_polygon_interactive(data=scoring_table[11:15,][!is.na(scoring_table$value[11:15]),],colour = "#CECECE", fill="#CECECE", alpha = 0.7) +
-    geom_point_interactive(
-      data=scoring_table[2:5,],
-      mapping = aes(tooltip = tooltip),
-      colour = "#F47931",
-      size = 3
-    ) +
-    geom_point_interactive(
-      data=scoring_table[7:10,],
-      mapping = aes(tooltip = tooltip),
-      colour = "#00679C",
-      size = 3
-    ) +
-    geom_point_interactive(
-      data=scoring_table[12:15,],
-      mapping = aes(tooltip = tooltip),
-      colour = "#CECECE",
-      size = 3
-    ) +
-    
-    xlab("") +
-    ylab("") +
+#Function setting up a generic plot for a radarchart (in global env)
+#Want to run this only once.
+setupRadarPlot <- function(max_score=4){
+  rp <<- ggplot() +
+    xlab("") +  ylab("") +
     coord_radar()+
     expand_limits(x=c(0,360),y = c(0, max_score)) +
     theme_bw() +        # Use ggplot theme_bw to remove greys
@@ -150,54 +118,132 @@ makeRadarPlot <- function(scoring_table, n_partitions){
       #panel.background = element_rect(fill="lightblue"),  #to make panel visible; keep commented-out unless testing
       #plot.background = element_rect(fill="darkseagreen") #to make margins visible; keep commented-out unless testing
     ) +
-    scale_y_continuous(breaks = seq(0, max_score, by=1), limits=c(0,max_score+1),
-                       expand=expansion(add=c(0,0))
-                       ) +
-    scale_x_continuous(breaks = seq(15, 355, by=30),
-                       minor_breaks = NULL,
-                       labels = NULL
-                       ) +
+    scale_y_continuous(breaks = seq(0, max_score, by=1), limits=c(0,max_score+1), expand=expansion(add=c(0,0))) +
+    scale_x_continuous(breaks = seq(15, 355, by=30), minor_breaks = NULL, labels = NULL) +
     annotate( #these are the axis labels (levels 1-4) in grey
       "text",
-      x = 0,
-      y = seq(1, max_score, 1),
-      label = seq(1, max_score, 1),
-      size = 3,
-      colour = "grey"
-    )+
-    annotate( #these are the target/indicator labels in black, when not NA
+      x = 0, y = seq(1, max_score, 1),
+      label = seq(1, max_score, 1), size = 3, colour = "grey"
+    )
+  
+  #Creating data for background polygons (in global env)
+  bgPolygons_3<<-createBgpolygons(3,max_score)
+  bgPolygons_4<<-createBgpolygons(4,max_score)
+}
+
+#Function setting up a "Results" radar chart from a scoring table (but this set-up is dependent on scoring_table)
+setupRadarPlot_results <- function(scoring_table, n_partitions){
+  # Adding background polygons for 3 partitions (where relevant, 4th partition is added further down)
+  bgPolygons<-eval(parse(text=paste0("bgPolygons_",n_partitions)))  #accesses this from global env & reassigns locally
+  rp <- rp +     #accesses rp from global env, but updates it within function env
+    geom_polygon(data=bgPolygons[[1]],mapping = aes(x =x, y = value),linetype=0,fill="#F47931",alpha=0.2)+
+    geom_polygon(data=bgPolygons[[2]],mapping = aes(x =x, y = value),linetype=0,fill="#00679C",alpha=0.2)+
+    geom_polygon(data=bgPolygons[[3]],mapping = aes(x =x, y = value),linetype=0,fill="#CECECE",alpha=0.2)+
+  # Adding EU-EpiCap polygons from scoring tables, for 3 partitions (where relevant, 4th partition is added further down)
+    geom_polygon_interactive(data=scoring_table[1:5,][!is.na(scoring_table$value[1:5]),],mapping = aes(x =x, y = value),colour = "#F47931", fill="#F47931", alpha = 0.7) +
+    geom_polygon_interactive(data=scoring_table[6:10,][!is.na(scoring_table$value[6:10]),],mapping = aes(x =x, y = value),colour = "#00679C", fill="#00679C", alpha = 0.7) + 
+    geom_polygon_interactive(data=scoring_table[11:15,][!is.na(scoring_table$value[11:15]),],mapping = aes(x =x, y = value),colour = "#CECECE", fill="#CECECE", alpha = 0.7)
+  
+  # Adding background and EU-EpiCap polygons for 4th partition
+  if(n_partitions ==4){
+    rp <- rp +   #updates rp within function env
+      geom_polygon(data=bgPolygons[[4]],mapping = aes(x =x, y = value),linetype=0,fill="#63913E",alpha=0.2)+
+      geom_polygon_interactive(data=scoring_table[16:20,][!is.na(scoring_table$value[16:20]),],mapping = aes(x =x, y = value),colour = "#63913E", fill="#63913E", alpha = 0.7)+
+      # Changing the scale of the x axis to take into account the 4th partition
+      scale_x_continuous(breaks = c(seq(9,81,by=24),seq(99,171,by=24),seq(189,261,by=24),seq(279,351,by=24)), minor_breaks = NULL, labels = NULL)
+  }
+  return(rp) #returns rp (updated for results) to main results plotting function env
+}
+
+#Function setting up a "Benchmark" radar chart from a reference scoring table (set-up not dependent on EUEpiCap scoring table)
+#How can I avoid rerunning this every time a change is made in EUEpiCap profile?
+setupRadarPlot_benchmark <- function(ref_scoring_table, n_partitions){
+# Adding reference data range ribbons for 3 partitions (where relevant, 4th partition is added further down)
+  rp <- rp +     #accesses rp from global env, but updates it within function env
+    geom_ribbon(data=ref_scoring_table[1:4,],
+                mapping=aes(x = x, ymin = low, ymax = high),
+                fill="#F47931",alpha=0.2)+
+    geom_ribbon(data=ref_scoring_table[5:8,],
+                mapping=aes(x = x, ymin = low, ymax = high),
+                fill="#00679C",alpha=0.2)+
+    geom_ribbon(data=ref_scoring_table[9:12,],
+                mapping=aes(x = x, ymin = low, ymax = high),
+                fill="#CECECE",alpha=0.2)+
+    geom_point(data=ref_scoring_table[1:12,], mapping=aes(x = x, y = value),
+               shape=3, colour=c(rep("#F47931",4),rep("#00679C",4),rep("#CECECE",4)))
+
+  if(n_partitions ==4){   # Adding reference data range ribbon for 4th partition
+    rp <- rp +   #updates rp within function env
+      geom_ribbon(data=ref_scoring_table[13:16,],
+                  mapping=aes(x = x, ymin = low, ymax = high),
+                  fill="#63913E",alpha=0.2)+
+      geom_point(data=ref_scoring_table[13:16,],
+                 mapping=aes(x = x, y = value),
+                 shape=3, colour="#63913E")+
+      # Changing the scale of the x axis to take into account the 4th partition
+      scale_x_continuous(breaks = c(seq(9,81,by=24),seq(99,171,by=24),seq(189,261,by=24),seq(279,351,by=24)), minor_breaks = NULL, labels = NULL)
+  }
+  return(rp) #returns rp (updated for benchmark) to main benchmark plotting function env
+}
+
+#Function adding EU-EpiCap profile data from EU-EpiCap scoring table (to results or benchmark radarchart)
+#How can I avoid rerunning this every time a different ref_scoring_table is selected?
+addDataToRadarPlot <- function(rp, scoring_table, n_partitions){ 
+  rp <- rp +
+  # Adding interactive data points for 3 partitions (where relevant, 4th partition is added further down)
+    geom_point_interactive(
+      data=scoring_table[2:5,], 
+      mapping = aes(x =x, y = value, tooltip = tooltip),
+      colour = "#F47931", size = 3
+    ) +
+    geom_point_interactive(
+      data=scoring_table[7:10,],
+      mapping = aes(x =x, y = value, tooltip = tooltip),
+      colour = "#00679C", size = 3
+    ) +
+    geom_point_interactive(
+      data=scoring_table[12:15,],
+      mapping = aes(x =x, y = value, tooltip = tooltip),
+      colour = "#CECECE", size = 3
+    ) +
+    # Adding target/indicator labels around plots  
+    annotate( #these are the labels in black, when not NA
       "text",
-      x = scoring_table$x[(!is.na(scoring_table$value) & scoring_table$value !=0)],
-      y = 5,
+      x = scoring_table$x[(!is.na(scoring_table$value) & scoring_table$value !=0)], y = 5,
       label = str_wrap(scoring_table$variable[(!is.na(scoring_table$value) & scoring_table$value !=0)], width=15),
-      size = 3,
-      colour = "black"
+      size = 3, colour = "black"
     )+
-    annotate( #these are the indicator labels in grey, for NA values
+    annotate( #these are indicator labels in grey, for NA values
       "text",
-      x = scoring_table$x[is.na(scoring_table$value)],
-      y = 5,
+      x = scoring_table$x[is.na(scoring_table$value)], y = 5,
       label = str_wrap(scoring_table$variable[is.na(scoring_table$value)], width=15),
-      size = 3,
-      colour = "grey"
+      size = 3, colour = "grey"
     )
     
-    if(n_partitions ==4){
-      p <- p +
-        geom_polygon(data=bgPolygons[[4]],linetype=0,fill="#63913E",alpha=0.2) +
-        geom_polygon_interactive(data=scoring_table[16:20,][!is.na(scoring_table$value[16:20]),],colour = "#63913E", fill="#63913E", alpha = 0.7) +
-        geom_point_interactive(
-          data=scoring_table[17:20,],
-          mapping = aes(tooltip = tooltip),
-          colour = "#63913E",
-          size = 3
-        ) +
-        scale_x_continuous(breaks = c(seq(9,81,by=24),seq(99,171,by=24),seq(189,261,by=24),seq(279,351,by=24)),
-                           minor_breaks = NULL,
-                           labels = NULL
-                           )
-    }
+  if(n_partitions ==4){ 
+    rp <- rp +
+      geom_point_interactive( # Adding data points for 4th partition
+        data=scoring_table[17:20,],
+        mapping = aes(x =x, y = value, tooltip = tooltip),
+        colour = "#63913E", size = 3
+      )
+  }
+  return(rp) #returns rp (updated with data) to main results or benchmark plotting function env
+}
 
-  girafe(code = print(p))
-  
+#Main function making a "Results" radar chart from a scoring table
+makeRadarPlot_results <- function(scoring_table, n_partitions){
+  rp <- setupRadarPlot_results(scoring_table=scoring_table, n_partitions=n_partitions) %>% #accesses rp from global env, but returns updated value within main function env
+    addDataToRadarPlot(scoring_table=scoring_table, n_partitions=n_partitions) #accesses rp from main function env, and returns updated value within main function env
+  girafe(code = print(rp)) # Printing the chart
+}
+
+#Main function making a "Benchmark" radar chart from an EU-EpiCap profile scoring table and a reference scoring table
+#How can I avoid rerunning (parts of these) functions unnecessarily?
+# - avoid rerunning setupRadarPlot_benchmark() every time a change is made in EUEpiCap profile?
+# - is there a way to avoid rerunning addData every time a different ref_scoring_table is selected?
+makeRadarPlot_benchmark <- function(scoring_table, n_partitions, ref_scoring_table){
+  rp <- setupRadarPlot_benchmark(ref_scoring_table=ref_scoring_table, n_partitions=n_partitions) %>% #accesses rp from global env, but returns updated value within main function env
+    addDataToRadarPlot(scoring_table=scoring_table, n_partitions=n_partitions) #accesses rp from main function env, and returns updated value within main function env
+  girafe(code = print(rp)) # Printing the chart
 }
