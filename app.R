@@ -192,12 +192,8 @@ ui <- dashboardPage(
                     h2("Download selected questionnaire answers"),
                     questionnaireDownloadUI("downloadedAnswers", "Download EU-EpiCap profile (.csv or .rds format)")
             ),       
-            tabItem(tabName = "results", resultsOutput("resultsPage")
-            ),
-            tabItem(tabName = "benchmark",
-                    h2("Compare your EU-EpiCap profile to a reference dataset"),
-                    benchmarkUI("benchmarkPlots",ref_datasets=ref_datasets)
-            )
+            tabItem(tabName = "results", resultsOutput("resultsPage")),
+            tabItem(tabName = "benchmark", benchmarkUI("benchmarkPage",ref_datasets=ref_datasets))
         )    
     )
 )
@@ -235,7 +231,7 @@ server <- function(input, output, session) {
     resultsServer("resultsPage", scores_targets=scores_targets, scores_indicators=scores_indicators, scores_dimensions=scores_dimensions,stringsAsFactors = FALSE)
     
     ### Benchmarking
-    benchmarkServer("benchmarkPlots", scores_targets=scores_targets, scores_indicators=scores_indicators, ref_files=ref_files, stringsAsFactors = FALSE)
+    benchmarkServer("benchmarkPage", scores_targets=scores_targets, scores_indicators=scores_indicators, ref_files=ref_files, stringsAsFactors = FALSE)
     }
 
 shinyApp(ui, server)
