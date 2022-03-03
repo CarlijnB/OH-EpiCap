@@ -69,6 +69,8 @@ readQuestionnaire <- function(datafile) {
   #Split up "Possible Answers" (one long string) into character vector "Options" with separate options, based on new line character
   questionnaire$Options <- strsplit(questionnaire$`Possible answers `,"\r\n")
   questionnaire <- select(questionnaire,-`Possible answers `)
+  questionnaire$Colour <- c(rep("#F47931",16),rep("#00679C",16),rep("#CECECE",16))
+  questionnaire$Transparency <- rep(c(rep(1,4),rep(0.9,4),rep(0.8,4),rep(0.7,4)),3)
 
   return(questionnaire)
 }

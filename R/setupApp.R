@@ -10,6 +10,7 @@ setupApp <- function(questionnaire_file){
   # Setup for plotting of results ----------------------------------------------------------------
   
   setupRadarPlot()
+  setupLollipopPlot()
 
   # Setup for benchmarking ------------------------------------------------------------
   

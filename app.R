@@ -192,9 +192,7 @@ ui <- dashboardPage(
                     h2("Download selected questionnaire answers"),
                     questionnaireDownloadUI("downloadedAnswers", "Download EU-EpiCap profile (.csv or .rds format)")
             ),       
-            tabItem(tabName = "results",
-                    h2("Visualise your EU-EpiCap profile"),
-                    resultsOutput("resultsPlots")
+            tabItem(tabName = "results", resultsOutput("resultsPage")
             ),
             tabItem(tabName = "benchmark",
                     h2("Compare your EU-EpiCap profile to a reference dataset"),
@@ -230,10 +228,11 @@ server <- function(input, output, session) {
     # extracting questionnaire choices, and adding them to the questionnaire dataframe
     questionnaire_w_values <- addScores2Questionnaire(input,questionnaire) #by sticking everything into one df, all wrangling + plotting code has to be rerun as soon as I change 1 value 
     # summarising scores by target for all dimensions, and by indicator for each dimension separately
+    scores_dimensions<-reactive(scoringTable(questionnaire_w_values(),"dimensions"))
     scores_targets<-reactive(scoringTable(questionnaire_w_values(),"targets"))
     scores_indicators<-reactive(scoringTable(questionnaire_w_values(),"indicators"))
     # creating Results radarcharts
-    resultsServer("resultsPlots", scores_targets=scores_targets, scores_indicators=scores_indicators, stringsAsFactors = FALSE)
+    resultsServer("resultsPage", scores_targets=scores_targets, scores_indicators=scores_indicators, scores_dimensions=scores_dimensions,stringsAsFactors = FALSE)
     
     ### Benchmarking
     benchmarkServer("benchmarkPlots", scores_targets=scores_targets, scores_indicators=scores_indicators, ref_files=ref_files, stringsAsFactors = FALSE)

@@ -102,7 +102,7 @@ coord_radar <- function (theta = "x", start = 0, direction = 1){
 }
 
 #Function setting up a generic plot for a radarchart (in global env)
-#Want to run this only once.
+#Run only once at app setup
 setupRadarPlot <- function(max_score=4){
   rp <<- ggplot() +
     xlab("") +  ylab("") +
@@ -136,19 +136,44 @@ setupRadarPlot_results <- function(scoring_table, n_partitions){
   # Adding background polygons for 3 partitions (where relevant, 4th partition is added further down)
   bgPolygons<-eval(parse(text=paste0("bgPolygons_",n_partitions)))  #accesses this from global env & reassigns locally
   rp <- rp +     #accesses rp from global env, but updates it within function env
-    geom_polygon(data=bgPolygons[[1]],mapping = aes(x =x, y = value),linetype=0,fill="#F47931",alpha=0.2)+
-    geom_polygon(data=bgPolygons[[2]],mapping = aes(x =x, y = value),linetype=0,fill="#00679C",alpha=0.2)+
-    geom_polygon(data=bgPolygons[[3]],mapping = aes(x =x, y = value),linetype=0,fill="#CECECE",alpha=0.2)+
+    geom_polygon(data=bgPolygons[[1]],mapping = aes(x =x, y = value),linetype=0,
+                 fill=scoring_table[1:5,][!is.na(scoring_table$value[1:5]),]$colour[2],
+                 alpha=(scoring_table[1:5,][!is.na(scoring_table$value[1:5]),]$transparency-0.5)[2])+
+    geom_polygon(data=bgPolygons[[2]],mapping = aes(x =x, y = value),linetype=0,
+                 fill=scoring_table[6:10,][!is.na(scoring_table$value[6:10]),]$colour[2],
+                 alpha=(scoring_table[6:10,][!is.na(scoring_table$value[6:10]),]$transparency-0.5)[2])+
+    geom_polygon(data=bgPolygons[[3]],mapping = aes(x =x, y = value),linetype=0,
+                 fill=scoring_table[11:15,][!is.na(scoring_table$value[11:15]),]$colour[2],
+                 alpha=(scoring_table[11:15,][!is.na(scoring_table$value[11:15]),]$transparency-0.5)[2])+
   # Adding EU-EpiCap polygons from scoring tables, for 3 partitions (where relevant, 4th partition is added further down)
-    geom_polygon_interactive(data=scoring_table[1:5,][!is.na(scoring_table$value[1:5]),],mapping = aes(x =x, y = value),colour = "#F47931", fill="#F47931", alpha = 0.7) +
-    geom_polygon_interactive(data=scoring_table[6:10,][!is.na(scoring_table$value[6:10]),],mapping = aes(x =x, y = value),colour = "#00679C", fill="#00679C", alpha = 0.7) + 
-    geom_polygon_interactive(data=scoring_table[11:15,][!is.na(scoring_table$value[11:15]),],mapping = aes(x =x, y = value),colour = "#CECECE", fill="#CECECE", alpha = 0.7)
+    geom_polygon_interactive(data = scoring_table[1:5,][!is.na(scoring_table$value[1:5]),],mapping = aes(x =x, y = value),
+                             colour = alpha(scoring_table[1:5,][!is.na(scoring_table$value[1:5]),]$colour[2],
+                                            alpha=(scoring_table[1:5,][!is.na(scoring_table$value[1:5]),]$transparency-0.3)[2]),
+                             fill = scoring_table[1:5,][!is.na(scoring_table$value[1:5]),]$colour[2],
+                             alpha = (scoring_table[1:5,][!is.na(scoring_table$value[1:5]),]$transparency-0.3)[2]) +
+    geom_polygon_interactive(data = scoring_table[6:10,][!is.na(scoring_table$value[6:10]),],mapping = aes(x =x, y = value),
+                             colour = alpha(scoring_table[6:10,][!is.na(scoring_table$value[6:10]),]$colour[2],
+                                            alpha=(scoring_table[6:10,][!is.na(scoring_table$value[6:10]),]$transparency-0.3)[2]),
+                             fill = scoring_table[6:10,][!is.na(scoring_table$value[6:10]),]$colour[2],
+                             alpha = (scoring_table[6:10,][!is.na(scoring_table$value[6:10]),]$transparency-0.3)[2]) + 
+    geom_polygon_interactive(data = scoring_table[11:15,][!is.na(scoring_table$value[11:15]),],mapping = aes(x =x, y = value),
+                             colour = alpha(scoring_table[11:15,][!is.na(scoring_table$value[11:15]),]$colour[2],
+                                            alpha=(scoring_table[11:15,][!is.na(scoring_table$value[11:15]),]$transparency-0.3)[2]), 
+                             fill = scoring_table[11:15,][!is.na(scoring_table$value[11:15]),]$colour[2],
+                             alpha = (scoring_table[11:15,][!is.na(scoring_table$value[11:15]),]$transparency-0.3)[2])
   
   # Adding background and EU-EpiCap polygons for 4th partition
   if(n_partitions ==4){
     rp <- rp +   #updates rp within function env
-      geom_polygon(data=bgPolygons[[4]],mapping = aes(x =x, y = value),linetype=0,fill="#63913E",alpha=0.2)+
-      geom_polygon_interactive(data=scoring_table[16:20,][!is.na(scoring_table$value[16:20]),],mapping = aes(x =x, y = value),colour = "#63913E", fill="#63913E", alpha = 0.7)+
+      geom_polygon(data=bgPolygons[[4]],mapping = aes(x =x, y = value),linetype=0,
+                   fill=scoring_table[16:20,][!is.na(scoring_table$value[16:20]),]$colour[2],
+                   alpha=(scoring_table[16:20,][!is.na(scoring_table$value[16:20]),]$transparency-0.5)[2])+
+      geom_polygon_interactive(data = scoring_table[16:20,][!is.na(scoring_table$value[16:20]),],
+                               mapping = aes(x =x, y = value),
+                               colour = alpha(scoring_table[16:20,][!is.na(scoring_table$value[16:20]),]$colour[2],
+                                              alpha=(scoring_table[16:20,][!is.na(scoring_table$value[16:20]),]$transparency-0.3)[2]),
+                               fill = scoring_table[16:20,][!is.na(scoring_table$value[16:20]),]$colour[2],
+                               alpha = (scoring_table[16:20,][!is.na(scoring_table$value[16:20]),]$transparency-0.3)[2])+
       # Changing the scale of the x axis to take into account the 4th partition
       scale_x_continuous(breaks = c(seq(9,81,by=24),seq(99,171,by=24),seq(189,261,by=24),seq(279,351,by=24)), minor_breaks = NULL, labels = NULL)
   }
@@ -162,24 +187,29 @@ setupRadarPlot_benchmark <- function(ref_scoring_table, n_partitions){
   rp <- rp +     #accesses rp from global env, but updates it within function env
     geom_ribbon(data=ref_scoring_table[1:4,],
                 mapping=aes(x = x, ymin = low, ymax = high),
-                fill="#F47931",alpha=0.2)+
+                fill = ref_scoring_table[1:4,]$colour,
+                alpha = (ref_scoring_table[1:4,]$transparency-0.5))+
     geom_ribbon(data=ref_scoring_table[5:8,],
                 mapping=aes(x = x, ymin = low, ymax = high),
-                fill="#00679C",alpha=0.2)+
+                fill = ref_scoring_table[5:8,]$colour,
+                alpha = (ref_scoring_table[5:8,]$transparency-0.5))+
     geom_ribbon(data=ref_scoring_table[9:12,],
                 mapping=aes(x = x, ymin = low, ymax = high),
-                fill="#CECECE",alpha=0.2)+
-    geom_point(data=ref_scoring_table[1:12,], mapping=aes(x = x, y = value),
-               shape=3, colour=c(rep("#F47931",4),rep("#00679C",4),rep("#CECECE",4)))
+                fill = ref_scoring_table[9:12,]$colour,
+                alpha = (ref_scoring_table[9:12,]$transparency-0.5))+
+    geom_point(data=ref_scoring_table[1:12,], mapping=aes(x = x, y = value), shape=3,
+               colour = ref_scoring_table[1:12,]$colour,
+               alpha = ref_scoring_table[1:12,]$transparency)
 
   if(n_partitions ==4){   # Adding reference data range ribbon for 4th partition
     rp <- rp +   #updates rp within function env
       geom_ribbon(data=ref_scoring_table[13:16,],
                   mapping=aes(x = x, ymin = low, ymax = high),
-                  fill="#63913E",alpha=0.2)+
-      geom_point(data=ref_scoring_table[13:16,],
-                 mapping=aes(x = x, y = value),
-                 shape=3, colour="#63913E")+
+                  fill = ref_scoring_table[13:16,]$colour,
+                  alpha = (ref_scoring_table[13:16,]$transparency-0.5))+
+      geom_point(data=ref_scoring_table[13:16,], mapping=aes(x = x, y = value), shape=3,
+                 colour = ref_scoring_table[13:16,]$colour,
+                 alpha = ref_scoring_table[13:16,]$transparency)+
       # Changing the scale of the x axis to take into account the 4th partition
       scale_x_continuous(breaks = c(seq(9,81,by=24),seq(99,171,by=24),seq(189,261,by=24),seq(279,351,by=24)), minor_breaks = NULL, labels = NULL)
   }
@@ -192,19 +222,11 @@ addDataToRadarPlot <- function(rp, scoring_table, n_partitions){
   rp <- rp +
   # Adding interactive data points for 3 partitions (where relevant, 4th partition is added further down)
     geom_point_interactive(
-      data=scoring_table[2:5,], 
+      data=scoring_table[c(2:5,7:10,12:15),], 
       mapping = aes(x =x, y = value, tooltip = tooltip),
-      colour = "#F47931", size = 3
-    ) +
-    geom_point_interactive(
-      data=scoring_table[7:10,],
-      mapping = aes(x =x, y = value, tooltip = tooltip),
-      colour = "#00679C", size = 3
-    ) +
-    geom_point_interactive(
-      data=scoring_table[12:15,],
-      mapping = aes(x =x, y = value, tooltip = tooltip),
-      colour = "#CECECE", size = 3
+      colour = scoring_table[c(2:5,7:10,12:15),]$colour,
+      alpha = scoring_table[c(2:5,7:10,12:15),]$transparency,
+      size = 3
     ) +
     # Adding target/indicator labels around plots  
     annotate( #these are the labels in black, when not NA
@@ -225,7 +247,9 @@ addDataToRadarPlot <- function(rp, scoring_table, n_partitions){
       geom_point_interactive( # Adding data points for 4th partition
         data=scoring_table[17:20,],
         mapping = aes(x =x, y = value, tooltip = tooltip),
-        colour = "#63913E", size = 3
+        colour = scoring_table[17:20,]$colour,
+        alpha = scoring_table[17:20,]$transparency,
+        size = 3
       )
   }
   return(rp) #returns rp (updated with data) to main results or benchmark plotting function env

@@ -1,3 +1,16 @@
+#Helper function: create reference data file from multiple EU-Epicap profiles
+#createRefDataset <- function(files, outputname){
+#  
+#  #if .rds file
+#  if(tools::file_ext(userFile()$datapath)=="rds"){
+#    readRDS(userFile()$datapath)  
+#    #if .csv file
+#  } else {
+#    df <- read.csv(userFile()$datapath, header = TRUE, sep = ",", stringsAsFactors = stringsAsFactors, colClasses="character", na.strings = NULL)
+#    setNames(as.list(df$Value),df$Question)
+#  } 
+#}
+
 #Helper function: formats a reference data file into scoring table format
 formatRefDataset <- function(refdatafile){
   
@@ -57,9 +70,9 @@ benchmarkServer <- function(id, scores_targets=scores_targets, scores_indicators
       ref_indic<-reactive({read.csv(paste0("data/reference_datasets/",as.character(selected_ref_files()[which(str_detect(ref_files,"STindicators"))])))})
       #generate radarcharts
       output$"benchmark_all" <- renderGirafe(makeRadarPlot_benchmark(scores_targets(),3,ref_targets()))
-      output$"benchmark_1" <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[1:20,],4,ref_indic()))
-      output$"benchmark_2" <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[21:40,],4,ref_indic()))
-      output$"benchmark_3" <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[41:60,],4,ref_indic()))
+      output$"benchmark_1" <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[1:20,],4,ref_indic()[1:16,]))
+      output$"benchmark_2" <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[21:40,],4,ref_indic()[17:32,]))
+      output$"benchmark_3" <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[41:60,],4,ref_indic()[33:48,]))
       }
   )    
 }
