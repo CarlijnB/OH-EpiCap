@@ -220,17 +220,18 @@ server <- function(input, output, session) {
         sapply(comment_inputs(), function(x){updateTextInput(session,inputId=x,value=state()[[x]])})
         })
 
-    ### scoring the questionnaire & plotting
+    ### scoring the questionnaire 
     # extracting questionnaire choices, and adding them to the questionnaire dataframe
     questionnaire_w_values <- addScores2Questionnaire(input,questionnaire) #by sticking everything into one df, all wrangling + plotting code has to be rerun as soon as I change 1 value 
     # summarising scores by target for all dimensions, and by indicator for each dimension separately
     scores_dimensions<-reactive(scoringTable(questionnaire_w_values(),"dimensions"))
     scores_targets<-reactive(scoringTable(questionnaire_w_values(),"targets"))
     scores_indicators<-reactive(scoringTable(questionnaire_w_values(),"indicators"))
-    # creating Results radarcharts
+    
+    ### creating the Results page (with value boxes, plots, and associated texts)
     resultsServer("resultsPage", scores_targets=scores_targets, scores_indicators=scores_indicators, scores_dimensions=scores_dimensions,stringsAsFactors = FALSE)
     
-    ### Benchmarking
+    ### creating the Benchmarking page (with plots and associated texts)
     benchmarkServer("benchmarkPage", scores_targets=scores_targets, scores_indicators=scores_indicators, ref_files=ref_files, stringsAsFactors = FALSE)
     }
 
