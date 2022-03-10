@@ -76,7 +76,7 @@ scoringTable <- function(questionnaire_w_values, level, reference = FALSE) {
                                low = ifelse(reference== FALSE, NA, mean(low,na.rm=TRUE)), #review when clearer what values 
                                high = ifelse(reference== FALSE, NA, mean(high,na.rm=TRUE)), #low and high should display
                                tooltip = ifelse(reference == FALSE,
-                                                paste(Indicators,"-",Chosen_value,collapse="\n"),
+                                                paste("Target average:",value_t,"\n",paste(Indicators,"-",Chosen_value,collapse="\n")),
                                                 "sample tooltip for benchmark ref dataset"),
                                colour = unique(Colour),
                                transparency = unique(Transparency)
