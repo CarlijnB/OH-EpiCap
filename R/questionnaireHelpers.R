@@ -22,6 +22,9 @@ readQuestionnaire <- function(datafile) {
     dplyr::filter(!is_blank) %>%
     select(sheet,row,col,data_type,character)
   
+  #remove leading and trailing whitespaces
+  questionnaire$character<-trimws(questionnaire$character)
+  
   #extract generic dimension data, and remove dimension text from questionnaire
   questionnaire<-questionnaire[!(questionnaire$row==2 & questionnaire$col==1),]
   
@@ -67,10 +70,16 @@ readQuestionnaire <- function(datafile) {
     select(-sheet)
   
   #Split up "Possible Answers" (one long string) into character vector "Options" with separate options, based on new line character
-  questionnaire$Options <- strsplit(questionnaire$`Possible answers `,"\r\n")
-  questionnaire <- select(questionnaire,-`Possible answers `)
+  questionnaire$Options <- strsplit(questionnaire$`Possible answers`,"\r\n")
+  questionnaire <- select(questionnaire,-`Possible answers`)
+  
+  #Split up "Questions" into "Question" and "Notes"
+  questionnaire <- questionnaire %>% separate(Questions, c("Question","Notes"),sep="\\?",fill="right")
+  questionnaire$Question<-paste0(questionnaire$Question,"?")
+  questionnaire$Notes<-trimws(questionnaire$Notes)
   questionnaire$Colour <- c(rep("#F47931",16),rep("#00679C",16),rep("#CECECE",16))
   questionnaire$Transparency <- rep(c(rep(1,4),rep(0.9,4),rep(0.8,4),rep(0.7,4)),3)
+
 
   return(questionnaire)
 }
@@ -89,10 +98,11 @@ questionnaire2Commands <- function(questionnaire) {
   #Add column with values of the options (NA,1,2,3,4 - as strings)
   questionnaire$Values<-lapply(questionnaire$Options,function(x) {sub(pattern = "\\..+$","",x,fixed=FALSE)})
   #Combine "ID", "Options", and "Values" columns into a list of arguments for the radioButtons command
-  questionnaire <- within(questionnaire,Rb_args<-paste0('list(inputId = "Q',ID,'", label = NULL, selected = character(0), width = "100%", choiceNames=',Options,', choiceValues=',Values,')'))
-  #Add "list()" to ID+Indicators, Questions, Target to make argument lists for do.call
-  questionnaire <- within(questionnaire,Indicator<-paste0('list("',ID,' ',Indicators,'")'))
-  questionnaire <- within(questionnaire,Question<-paste0('list("',`Questions `,'")'))
+  questionnaire <- within(questionnaire,Rb_args<-paste0('list(inputId = "Q',ID,'", label = "", selected = character(0), width = "100%", choiceNames=',Options,', choiceValues=',Values,')'))
+  #Add "list()" to Indicators, Question, Notes, Target to make argument lists for do.call
+  questionnaire <- within(questionnaire,Indicator<-paste0('list("',Indicators,'")'))
+  questionnaire <- within(questionnaire,Question<-paste0('list("',Question,'")'))
+  questionnaire <- within(questionnaire,Notes<-paste0('list(tags$i("',gsub("\r\n",'",br(),"',Notes),'"))'))
   questionnaire <- within(questionnaire,Target<-paste0('list(id=paste0("T","',str_match(Target,"\\d\\.\\d"),'"),h3("',Target,'"))'))
   #Add option to comment (textInput) for each indicator
   questionnaire <- within(questionnaire,Comment_box<-paste0('list(inputId = "C',ID,'", label = NULL, placeholder = "Type here any comments to supplement your answer", width = "100%")'))
@@ -100,10 +110,10 @@ questionnaire2Commands <- function(questionnaire) {
   #Make commands df: Extract Indicator, Question and Rb_args columns; rename cols; turn into "long matrix" format
   #Also extracts Dimension column, but keeps this out of the longmatrix format, to facilitate filtering
   commands <-
-    questionnaire[c("Dimension","Target","Indicator","Question","Rb_args","Comment_box")] %>%
-    `colnames<-`(c("Dimension","div","strong","p","radioButtons","textInput")) %>%  
-    pivot_longer(cols=c(2,3,4,5,6),names_to="Command",values_to="Arguments") %>%
-    unique() #to remove duplicate Target rows (want to display these only once)
+    questionnaire[c("Dimension","Target","Indicator","Question","Notes","Rb_args","Comment_box")] %>%
+    `colnames<-`(c("Dimension","div","strong","p","tagList","radioButtons","textInput")) %>%  
+    pivot_longer(cols=c(2,3,4,5,6,7),names_to="Command",values_to="Arguments") %>%
+    unique()
   
   return(commands)
 }

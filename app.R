@@ -186,7 +186,7 @@ ui <- dashboardPage(
                           tags$li(tags$b("Target 3.4 Ultimate outcomes"), "focuses on research opportunities, policy changes, behavioral changes and better health outcomes that are attributed to the OH surveillance system.")
                         ),
                     ),
-                    buildQuestionnaireUI(commands[commands$Dimension=='Dimension 3: Impact ',])
+                    buildQuestionnaireUI(commands[commands$Dimension=='Dimension 3: Impact',])
             ),
             tabItem(tabName = "download",
                     h2("Download selected questionnaire answers"),

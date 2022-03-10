@@ -50,7 +50,7 @@ scoringTable <- function(questionnaire_w_values, level, reference = FALSE) {
 
   if(level == "indicators") {
     scores_df <- questionnaire_w_values %>%
-      mutate(variable = paste(ID,Indicators),
+      mutate(variable = Indicators,
              value = Chosen_value,
              x=rep(c(seq(9,81,24),seq(99,171,24),seq(189,261,24),seq(279,351,24)),3),
              tooltip = paste0(str_match(Options,paste(Chosen_value,'\\. *([^"]+)\\"',sep=''))[,2],'\n',Comment),
@@ -76,7 +76,7 @@ scoringTable <- function(questionnaire_w_values, level, reference = FALSE) {
                                low = ifelse(reference== FALSE, NA, mean(low,na.rm=TRUE)), #review when clearer what values 
                                high = ifelse(reference== FALSE, NA, mean(high,na.rm=TRUE)), #low and high should display
                                tooltip = ifelse(reference == FALSE,
-                                                paste(ID,Indicators,"-",Chosen_value,collapse="\n"),
+                                                paste(Indicators,"-",Chosen_value,collapse="\n"),
                                                 "sample tooltip for benchmark ref dataset"),
                                colour = unique(Colour),
                                transparency = unique(Transparency)
