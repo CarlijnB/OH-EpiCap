@@ -1,3 +1,4 @@
+
 # Module UI function
 resultsOutput <- function(id, label = "results") {
   # `NS(id)` returns a namespace function, which was save as `ns` and will
@@ -7,66 +8,69 @@ resultsOutput <- function(id, label = "results") {
   tagList(
     h2("Visualise your EU-EpiCap profile"),
     fluidRow(
-      box(width=12,
+      box(width=10,
           p("This page visually summarises the interactively completed, or uploaded, EU-EpiCap profile.")
-       )),
-    fluidRow(
-      box(width=12,
-          title="EU-EpiCap Index and Dimensions",
-          solidHeader=TRUE, status="success",
-          collapsible=TRUE, collapsed=FALSE,
-          p("EU-EpiCap and Dimension indices represent mean scores over all component questions, expressed as percentages."),
-          textOutput(ns("restxt_overall")),
-          fluidRow(column(4),
-                   valueBoxOutput(ns("indexBox")),
-                   column(4)),
-          fluidRow(valueBoxOutput(ns("organizationBox")),
-                   valueBoxOutput(ns("operationsBox")),
-                   valueBoxOutput(ns("impactBox")))
-          )),
-    fluidRow(
-      box(width=12,
-          title="Targets",
-          solidHeader=TRUE, status="info",
-          collapsible=TRUE, collapsed=FALSE,
-          p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Users are encouraged to hover over plotted data points to view breakdowns of scores."),
-          textOutput(ns("restxt_targets")),
-          fluidRow(column(6, girafeOutput(ns("lollipop_tar"))),
-                   column(6, girafeOutput(ns("radar_all"))))
-          )),
-    fluidRow(
-      box(width=12,
-          title="Dimension 1: Organization",
-          solidHeader=TRUE, status="warning",
-          collapsible=TRUE, collapsed=TRUE,
-          fluidRow(
-            column(6, 
-                   p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
-                   textOutput(ns("restxt_dim1"))),
-            column(6, girafeOutput(ns("radar_1"))))
-          )),
-    fluidRow(
-      box(width=12,
-          title="Dimension 2: Operations",
-          solidHeader=TRUE, status="primary",
-          collapsible=TRUE, collapsed=TRUE,
-          fluidRow(
-            column(6, 
-                   p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
-                   textOutput(ns("restxt_dim2"))),
-            column(6, girafeOutput(ns("radar_2"))))
-          )),
-    fluidRow(
-      box(width=12,
-          title="Dimension 3: Impact",
-          solidHeader=TRUE,
-          collapsible=TRUE, collapsed=TRUE,
-          fluidRow(
-            column(6,
-                   p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
-                   textOutput(ns("restxt_dim3"))),
-            column(6, girafeOutput(ns("radar_3"))))
-          ))
+       ),
+      capture_pdf(selector="#foo",filename="report",icon("download"),"Download report",loading=loading(),width=2)),
+    div(id="foo",
+      fluidRow(
+       box(width=12,
+           title="EU-EpiCap Index and Dimensions",
+           solidHeader=TRUE, status="success",
+           collapsible=TRUE, collapsed=FALSE,
+           p("EU-EpiCap and Dimension indices represent mean scores over all component questions, expressed as percentages."),
+           textOutput(ns("restxt_overall")),
+           fluidRow(column(4),
+                    valueBoxOutput(ns("indexBox")),
+                    column(4)),
+           fluidRow(valueBoxOutput(ns("organizationBox")),
+                    valueBoxOutput(ns("operationsBox")),
+                    valueBoxOutput(ns("impactBox")))
+           )),
+      fluidRow(
+        box(width=12,
+            title="Targets",
+            solidHeader=TRUE, status="info",
+            collapsible=TRUE, collapsed=FALSE,
+            p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Users are encouraged to hover over plotted data points to view breakdowns of scores."),
+            textOutput(ns("restxt_targets")),
+            fluidRow(column(6, girafeOutput(ns("lollipop_tar"))),
+                     column(6, girafeOutput(ns("radar_all"))))
+            )),
+      fluidRow(
+        box(width=12,
+            title="Dimension 1: Organization",
+            solidHeader=TRUE, status="warning",
+            collapsible=TRUE, collapsed=TRUE,
+            fluidRow(
+              column(6, 
+                     p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
+                     textOutput(ns("restxt_dim1"))),
+              column(6, girafeOutput(ns("radar_1"))))
+            )),
+      fluidRow(
+        box(width=12,
+            title="Dimension 2: Operations",
+            solidHeader=TRUE, status="primary",
+            collapsible=TRUE, collapsed=TRUE,
+            fluidRow(
+              column(6, 
+                     p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
+                     textOutput(ns("restxt_dim2"))),
+              column(6, girafeOutput(ns("radar_2"))))
+            )),
+      fluidRow(
+        box(width=12,
+            title="Dimension 3: Impact",
+            solidHeader=TRUE,
+            collapsible=TRUE, collapsed=TRUE,
+            fluidRow(
+              column(6,
+                     p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
+                     textOutput(ns("restxt_dim3"))),
+              column(6, girafeOutput(ns("radar_3"))))
+            ))
+    )
   )
 }
 
@@ -98,6 +102,16 @@ resultsServer <- function(id, scores_targets=scores_targets, scores_indicators=s
       output$restxt_dim1 <- renderText({"Sample text. Best Target score is "})
       output$restxt_dim2 <- renderText({"Sample text. Best Target score is "})
       output$restxt_dim3 <- renderText({"Sample text. Best Target score is "})
+ 
+      
+      
+      #generate automatic report , from https://shiny.rstudio.com/articles/generating-reports.html
+      #output$report <- downloadHandler(
+        #filename = "data/EUEpiCap-report.html",  # For PDF output, change this to .pdf
+        #content = function(file) {
+          #save_html(output$firstBox, "data/EUEpiCap-report.html")
+        #}
+      #)
     }
   )    
 }

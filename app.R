@@ -3,6 +3,7 @@
 library(shiny)
 library(shinydashboard)
 library(shinyjs)
+library(capture)
 
 setupApp(questionnaire_file = "data/EU-EpiCap_Questionnaire_21_11_30.xlsx")
 
