@@ -11,7 +11,8 @@ resultsOutput <- function(id, label = "results") {
       box(width=10,
           p("This page visually summarises the interactively completed, or uploaded, EU-EpiCap profile.")
        ),
-      capture_pdf(selector="#foo",filename="report",icon("download"),"Download report",loading=loading(),width=2)),
+      downloadButton(ns("report"), "Download report",width=2)
+      ),
     div(id="foo",
       fluidRow(
        box(width=12,
@@ -90,28 +91,40 @@ resultsServer <- function(id, scores_targets=scores_targets, scores_indicators=s
       output$impactBox <- renderValueBox({valueBox(paste0(round(impact_index(), 0),"%"), "Dimension 3: Impact", icon= icon("thumbs-up", lib = "glyphicon"), color = "black")})
       #generate plots
       #output$lollipop_dim <- renderGirafe(makeLollipopPlot(scores_dimensions(),"Dimensions"))
-      output$lollipop_tar <- renderGirafe(makeLollipopPlot(scores_targets(),"Targets"))
+      lollipopreactive_tar <- reactive({makeLollipopPlot(scores_targets(),"Targets")})
+      output$lollipop_tar <- renderGirafe(lollipopreactive_tar())
       #output$lollipop_1 <- renderGirafe(makeLollipopPlot(scores_indicators()[1:20,],"Indicators")) #Dimension-specific lollipop plots need labels based on target + short indicator name
-      output$radar_all <- renderGirafe(makeRadarPlot_results(scores_targets(),3))
-      output$radar_1 <- renderGirafe(makeRadarPlot_results(scores_indicators()[1:20,],4))
-      output$radar_2 <- renderGirafe(makeRadarPlot_results(scores_indicators()[21:40,],4))
-      output$radar_3 <- renderGirafe(makeRadarPlot_results(scores_indicators()[41:60,],4))
+      radreactive_all <- reactive({makeRadarPlot_results(scores_targets(),3)})
+      output$radar_all <- renderGirafe(radreactive_all())
+      radreactive_1 <- reactive({makeRadarPlot_results(scores_indicators()[1:20,],4)})
+      output$radar_1 <- renderGirafe(radreactive_1())
+      radreactive_2 <- reactive({makeRadarPlot_results(scores_indicators()[21:40,],4)})
+      output$radar_2 <- renderGirafe(radreactive_2())
+      radreactive_3 <- reactive({makeRadarPlot_results(scores_indicators()[41:60,],4)})
+      output$radar_3 <- renderGirafe(radreactive_3())
+
       #generate result texts
-      output$restxt_overall <- renderText({"Sample text. Foo"})
+      output$restxt_overall <- renderText(restxt_overall_reactive())
+      restxt_overall_reactive <- reactive({"Sample text. Foo"})
       output$restxt_targets <- renderText({"Sample text. Best Dim score is"})
       output$restxt_dim1 <- renderText({"Sample text. Best Target score is "})
       output$restxt_dim2 <- renderText({"Sample text. Best Target score is "})
       output$restxt_dim3 <- renderText({"Sample text. Best Target score is "})
  
-      
-      
       #generate automatic report , from https://shiny.rstudio.com/articles/generating-reports.html
-      #output$report <- downloadHandler(
-        #filename = "data/EUEpiCap-report.html",  # For PDF output, change this to .pdf
-        #content = function(file) {
-          #save_html(output$firstBox, "data/EUEpiCap-report.html")
-        #}
-      #)
+      output$report <- downloadHandler(
+        filename = "EUEpiCap-report.html",  # For PDF output, change this to .pdf
+        content = function(file) {
+          # Copy the report file to a temporary directory before processing it, in
+          # case we don't have write permissions to the current working dir (which
+          # can happen when deployed).
+          tempReport <- file.path(tempdir(), "report.rmd")
+          #tempReport <- "report.rmd"
+          file.copy("data/report-template.rmd", tempReport, overwrite = TRUE)
+          # Knit the document, and eval it in the current environment
+          rmarkdown::render(tempReport, output_file = file)
+        }
+      )
     }
   )    
 }
