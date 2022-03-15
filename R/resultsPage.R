@@ -22,11 +22,11 @@ resultsOutput <- function(id, label = "results") {
            p("EU-EpiCap and Dimension indices represent mean scores over all component questions, expressed as percentages."),
            textOutput(ns("restxt_overall")),
            fluidRow(column(4),
-                    valueBoxOutput(ns("indexBox")),
+                    gaugeOutput(ns("indexGauge")),
                     column(4)),
-           fluidRow(valueBoxOutput(ns("organizationBox")),
-                    valueBoxOutput(ns("operationsBox")),
-                    valueBoxOutput(ns("impactBox")))
+           fluidRow(column(4,gaugeOutput(ns("organizationGauge"))),
+                    column(4,gaugeOutput(ns("operationsGauge"))),
+                    column(4,gaugeOutput(ns("impactGauge"))))
            )),
       fluidRow(
         box(width=12,
@@ -80,15 +80,15 @@ resultsServer <- function(id, scores_targets=scores_targets, scores_indicators=s
     id,
     ## Below is the module function
     function(input, output, session) {
-      #value boxes
+      #gauges
       EUEpiCap_index<-reactive({(mean(scores_dimensions()$value, na.rm=TRUE)-1)*100/3})
       organization_index<-reactive({(scores_dimensions()$value[1]-1)*100/3})
       operations_index<-reactive({(scores_dimensions()$value[2]-1)*100/3})
       impact_index<-reactive({(scores_dimensions()$value[3]-1)*100/3})
-      output$indexBox <- renderValueBox({valueBox(paste0(round(EUEpiCap_index(), 0),"%"), "EU-EpiCap Index", icon= icon("thumbs-up", lib = "glyphicon"), color = "green")})
-      output$organizationBox <- renderValueBox({valueBox(paste0(round(organization_index(), 0),"%"), "Dimension 1: Organization", icon= icon("thumbs-up", lib = "glyphicon"), color = "orange")})
-      output$operationsBox <- renderValueBox({valueBox(paste0(round(operations_index(), 0),"%"), "Dimension 2: Operations", icon= icon("thumbs-up", lib = "glyphicon"), color = "blue")})
-      output$impactBox <- renderValueBox({valueBox(paste0(round(impact_index(), 0),"%"), "Dimension 3: Impact", icon= icon("thumbs-up", lib = "glyphicon"), color = "black")})
+      output$indexGauge <- renderGauge({gauge(round(EUEpiCap_index(), 0), 0, 100, symbol="%", "EU-EpiCap Index", sectors = gaugeSectors(colors = "green"))})
+      output$organizationGauge <- renderGauge({gauge(round(organization_index(), 0), 0, 100, symbol="%", "Dimension 1: Organization", sectors = gaugeSectors(colors = "#F47931"))})
+      output$operationsGauge <- renderGauge({gauge(round(operations_index(), 0), 0, 100, symbol="%", "Dimension 2: Operations", sectors = gaugeSectors(colors = "#00679C"))})
+      output$impactGauge <- renderGauge({gauge(round(impact_index(), 0), 0, 100,symbol="%", "Dimension 3: Impact", sectors = gaugeSectors(colors = "#CECECE"))})
       #generate plots
       #output$lollipop_dim <- renderGirafe(makeLollipopPlot(scores_dimensions(),"Dimensions"))
       lollipopreactive_tar <- reactive({makeLollipopPlot(scores_targets(),"Targets")})
@@ -119,7 +119,6 @@ resultsServer <- function(id, scores_targets=scores_targets, scores_indicators=s
           # case we don't have write permissions to the current working dir (which
           # can happen when deployed).
           tempReport <- file.path(tempdir(), "report.rmd")
-          #tempReport <- "report.rmd"
           file.copy("data/report-template.rmd", tempReport, overwrite = TRUE)
           # Knit the document, and eval it in the current environment
           rmarkdown::render(tempReport, output_file = file)

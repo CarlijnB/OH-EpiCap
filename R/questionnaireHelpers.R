@@ -89,7 +89,7 @@ readQuestionnaire <- function(datafile) {
 
 # This function turns the questionnaire df into a commands df for the Shiny app.
 # The new df alternates commands to generate:
-#   (1) Indicator number + name in bold text  -  command: strong(), arguments: paste0(id, indicator)
+#   (1) Indicator name in bold text  -  command: strong(), arguments: indicator
 #   (2) Indicator question + notes in normal text  -  command: p(), arguments: question
 #   (3) Radiobuttons  -  command: radioButtons(), arguments: rb_args
 

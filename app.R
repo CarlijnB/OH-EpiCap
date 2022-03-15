@@ -3,6 +3,7 @@
 library(shiny)
 library(shinydashboard)
 library(shinyjs)
+library(flexdashboard)
 
 
 setupApp(questionnaire_file = "data/EU-EpiCap_Questionnaire_21_11_30.xlsx")
@@ -229,7 +230,7 @@ server <- function(input, output, session) {
     scores_targets<-reactive(scoringTable(questionnaire_w_values(),"targets"))
     scores_indicators<-reactive(scoringTable(questionnaire_w_values(),"indicators"))
     
-    ### creating the Results page (with value boxes, plots, and associated texts)
+    ### creating the Results page (with gauges, plots, and associated texts)
     resultsServer("resultsPage", scores_targets=scores_targets, scores_indicators=scores_indicators, scores_dimensions=scores_dimensions,stringsAsFactors = FALSE)
     
     ### creating the Benchmarking page (with plots and associated texts)
