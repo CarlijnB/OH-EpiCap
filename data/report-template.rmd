@@ -5,15 +5,44 @@ output: html_document
 
 ```{r set-up, include=FALSE}
 knitr::opts_chunk$set(message = FALSE, warning = FALSE, error=FALSE, echo=FALSE)
+library(flexdashboard)
 ```
 
 ## EU-EpiCap Index and Dimensions
-```{r overall}
+```{r overall-text}
 restxt_overall_reactive()
-library(flexdashboard)
-gauge(round(EUEpiCap_index(),0),0,100,symbol="%",label="EU-EpiCap Index",gaugeSectors(success = c(80, 100), warning = c(40, 79), danger = c(0, 39)))
-#valueBox(paste0(round(organization_index(), 0),"%"), "Dimension 1: Organization", icon= icon("thumbs-up", lib = "glyphicon"), color = "orange")
 ```
+
+<div class = "row">
+<div class = "col-md-4">
+</div>
+<div class = "col-md-4">
+```{r index-gauge}
+g_index()
+```
+</div>
+<div class = "col-md-4">
+</div>
+</div>
+
+<div class = "row">
+<div class = "col-md-4">
+```{r dim1-gauge}
+g_org()
+```
+</div>
+<div class = "col-md-4">
+```{r dim2-gauge}
+g_ope()
+```
+</div>
+<div class = "col-md-4">
+```{r dim3-gauge}
+g_imp()
+```
+</div>
+</div>
+
 
 ## Targets
 <div class = "row">
