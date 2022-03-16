@@ -6,20 +6,20 @@ resultsOutput <- function(id, label = "results") {
   ns <- NS(id)
   
   tagList(
-    h2("Visualise your EU-EpiCap profile"),
+    h2("Visualise your OH-EpiCap profile"),
     fluidRow(
       box(width=10,
-          p("This page visually summarises the interactively completed, or uploaded, EU-EpiCap profile.")
+          p("This page visually summarises the interactively completed, or uploaded, OH-EpiCap profile.")
        ),
       downloadButton(ns("report"), "Download report",width=2)
       ),
     div(id="foo",
       fluidRow(
        box(width=12,
-           title="EU-EpiCap Index and Dimensions",
+           title="OH-EpiCap Index and Dimensions",
            solidHeader=TRUE, status="success",
            collapsible=TRUE, collapsed=FALSE,
-           p("EU-EpiCap and Dimension indices represent mean scores over all component questions, expressed as percentages."),
+           p("OH-EpiCap and Dimension indices represent mean scores over all component questions, expressed as percentages."),
            textOutput(ns("restxt_overall")),
            fluidRow(column(4),
                     gaugeOutput(ns("indexGauge")),
@@ -81,11 +81,11 @@ resultsServer <- function(id, scores_targets=scores_targets, scores_indicators=s
     ## Below is the module function
     function(input, output, session) {
       #gauges
-      EUEpiCap_index<-reactive({(mean(scores_dimensions()$value, na.rm=TRUE)-1)*100/3})
+      OHEpiCap_index<-reactive({(mean(scores_dimensions()$value, na.rm=TRUE)-1)*100/3})
       organization_index<-reactive({(scores_dimensions()$value[1]-1)*100/3})
       operations_index<-reactive({(scores_dimensions()$value[2]-1)*100/3})
       impact_index<-reactive({(scores_dimensions()$value[3]-1)*100/3})
-      g_index <- reactive({gauge(round(EUEpiCap_index(), 0), 0, 100, symbol="%", "EU-EpiCap Index", sectors = gaugeSectors(colors = "green"))})
+      g_index <- reactive({gauge(round(OHEpiCap_index(), 0), 0, 100, symbol="%", "OH-EpiCap Index", sectors = gaugeSectors(colors = "green"))})
       output$indexGauge <- renderGauge({g_index()})
       g_org <- reactive({gauge(round(organization_index(), 0), 0, 100, symbol="%", "Dimension 1: Organization", sectors = gaugeSectors(colors = "#F47931"))})
       output$organizationGauge <- renderGauge({g_org()})
@@ -117,7 +117,7 @@ resultsServer <- function(id, scores_targets=scores_targets, scores_indicators=s
  
       #generate automatic report , from https://shiny.rstudio.com/articles/generating-reports.html
       output$report <- downloadHandler(
-        filename = "EUEpiCap-report.html",  # For PDF output, change this to .pdf
+        filename = "OHEpiCap-report.html",  # For PDF output, change this to .pdf
         content = function(file) {
           # Copy the report file to a temporary directory before processing it, in
           # case we don't have write permissions to the current working dir (which

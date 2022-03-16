@@ -1,5 +1,5 @@
 ---
-title: "EU-EpiCap report"
+title: "OH-EpiCap report"
 output: html_document
 ---
 
@@ -8,7 +8,7 @@ knitr::opts_chunk$set(message = FALSE, warning = FALSE, error=FALSE, echo=FALSE)
 library(flexdashboard)
 ```
 
-## EU-EpiCap Index and Dimensions
+## OH-EpiCap Index and Dimensions
 ```{r overall-text}
 restxt_overall_reactive()
 ```

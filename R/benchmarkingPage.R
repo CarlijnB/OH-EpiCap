@@ -1,4 +1,4 @@
-#Helper function: create reference data file from multiple EU-Epicap profiles
+#Helper function: create reference data file from multiple OH-Epicap profiles
 #createRefDataset <- function(files, outputname){
 #  
 #  #if .rds file
@@ -50,10 +50,10 @@ benchmarkUI <- function(id, label = "benchmark", ref_datasets) {
   ns <- NS(id)
   
   tagList(
-    h2("Compare your EU-EpiCap profile with a reference dataset"),
+    h2("Compare your OH-EpiCap profile with a reference dataset"),
     fluidRow(
       box(width=12,
-          p("This page allows the user to visually compare the completed or uploaded EU-EpiCap profile to a selected reference dataset")
+          p("This page allows the user to visually compare the completed or uploaded OH-EpiCap profile to a selected reference dataset")
       )),
     fluidRow(
       box(width=12,
