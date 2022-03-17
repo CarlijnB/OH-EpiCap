@@ -116,3 +116,18 @@ scoringTable <- function(questionnaire_w_values, level, reference = FALSE) {
 }
 
 
+# Identify low and high scores --------------------------------------------
+
+# Used in creating dynamic text for Results and Benchmarking pages.
+# Input data = scoring tables
+
+id_low_scores<-function(data,threshold_low=2){
+  reactive({ifelse(length(data$variable[which(data$value<threshold_low & data$value !=0 & !is.na(data$value))])>0,
+                   toString(data$variable[which(data$value<threshold_low & data$value !=0 & !is.na(data$value))]),
+                   "None")})
+}
+id_high_scores<-function(data,threshold_high=3){
+  reactive({ifelse(length(data$variable[which(data$value>threshold_high & !is.na(data$value))])>0,
+                   toString(data$variable[which(data$value>threshold_high & !is.na(data$value))]),
+                   "None")})
+}
