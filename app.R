@@ -48,7 +48,7 @@ ui <- dashboardPage(
                               menuSubItem("Target 3.2", href="#T3.2",newtab=FALSE),
                               menuSubItem("Target 3.3", href="#T3.3",newtab=FALSE),
                               menuSubItem("Target 3.4", href="#T3.4",newtab=FALSE)),"impact"),
-                     menuItem("Download answers or report", tabName = "download")
+                     menuItem("Save answers to file", tabName = "download")
             ),
             menuItem("Results", tabName = "results", icon = icon("chart-pie")
                      ),
@@ -132,8 +132,28 @@ ui <- dashboardPage(
         tabItems(
             tabItem(tabName = "about",
                     h2("About the OH-EpiCap tool"),
-                    p("The MATRIX project aims to advance the implementation of One Health (OH) Surveillance in practice by building onto existing resources, adding value to them and creating synergies among the sectors at the national level."),
-                    p("Within work package four (WP4), a generic benchmarking tool (OH-EpiCap) is being developed for characterizing, monitoring and evaluating epidemiological surveillance capacities, which directly contribute to OHS. The tool aims to identify and describe the collaborations among actors involved in the surveillance of a hazard and to characterize the OH-ness of the surveillance system. The tool will support identification of areas that could lead to improvements in existing OH surveillance capacities.")
+                    #p("The MATRIX project aims to advance the implementation of One Health (OH) Surveillance in practice by building onto existing resources, adding value to them and creating synergies among the sectors at the national level."),
+                    #p("Within work package four (WP4), a generic benchmarking tool (OH-EpiCap) is being developed for characterizing, monitoring and evaluating epidemiological surveillance capacities, which directly contribute to OHS. The tool aims to identify and describe the collaborations among actors involved in the surveillance of a hazard and to characterize the OH-ness of the surveillance system. The tool will support identification of areas that could lead to improvements in existing OH surveillance capacities."),
+                    #br(),
+                    p("The purpose of the OH-EpiCap tool is to develop system-specific profiles of (potential) surveillance interoperability between sectors, highlighting both strength and gaps in surveillance capacity and capabilities. The OH-EpiCap tool will allow mapping, evaluation and improvement of ‘One Health-ness’ using a set of standardized indicators, to allow comparison across systems, countries and hazards of interest. Countries at similar levels of ‘OH-ness’, including similar capacities, limitations and resources, can together form an agreement to develop a common framework for One Health Surveillance (OHS) to address zoonotic threats across borders. This will improve national OH structures, including surveillance and data analysis, while also facilitating better integration of multinational collaboration. Countries at different levels of ‘OH-ness’ and surveillance capacity/resources can share experiences regarding surveillance practice against the same pathogen, transfer knowledge and share ideas to improve surveillance quality and efficacy across settings."),
+                    p("Some of the features of the tool include:"),
+                    tags$ul(
+                        tags$li("Evaluation of 'OH-ness' across three dimensions"),
+                        tags$li("Interactive visualisation of results"),
+                        tags$li("Benchmarking tool to compare to other One Health Surveillance systems"),
+                        ),
+                    br(),
+                    p(tags$b("Disclaimer:"),"Here we present a functional 'beta' version of the tool, that is still under development. Therefore, expect placeholder text in some areas and a work-in-progress user interface. Feedback on the tool is welcome, you can e-mail this to Dr. Joaquin Prada (j.prada@surrey.ac.uk)."),
+                    br(),
+                    p("The OH-EpiCap tool has been developed by the MATRIX consortium, an integrative project funded by the One Health European Joint Programme. The MATRIX consortium aims to advance the implementation of OHS in practice by building onto existing resources, adding value to them and creating synergies among the sectors at the national level.  One activity has been the development of the generic benchmarking tool presented here, for characterizing, monitoring and evaluating epidemiological surveillance capacities and capabilities, which directly contribute to OHS. The tool aims to identify and describe the collaborations among actors involved in the surveillance of a hazard and to characterize the OH-ness of the surveillance system. The tool will support identification of areas that could lead to improvements in existing OH surveillance capacities. "),
+                    br(),
+                    p("The OH-EpiCap tool is split into three Dimensions:"),
+                    tags$ul(
+                        tags$li("Dimension 1: Organization"),
+                        tags$li("Dimension 2: Operations"),
+                        tags$li("Dimension 3: Impact"),
+                    ),
+                    p("The OH-EpiCap questionnaire can be completed by answering the questions on each of the individual Dimension pages (under the Questionnaire tab in the sidebar).")
             ),
             #tabItem(tabName = "network",
             #        h2("Explore your surveillance network here")
@@ -145,8 +165,15 @@ ui <- dashboardPage(
             #        h2("How to complete the OH-EpiCap tool"),
             #),
             tabItem(tabName = "upload",
-                    h2("Upload answers from a previously (partially) completed questionnaire"),
-                    questionnaireUploadUI("datafile", "Upload OH-EpiCap profile (.csv or .rds format)"),
+                    h2("Upload questionnaire answers from file"),
+                    box(width=12,
+                        p("Previously saved questionnaire answers, such as from a partially completed questionnaire, can be uploaded from file here.",
+                          br(),
+                          "This allows the user to revisit or complete their answers, via the relevant Dimension pages.",
+                          br(),
+                          "If the uploaded questionnaire is complete, results can also be visualised on the Results page.")
+                        ),
+                    questionnaireUploadUI("datafile", "Upload saved OH-EpiCap answers (.csv or .rds format)"),
             ),       
             tabItem(tabName = "organization",
                     h2("Dimension 1: Organization"),
@@ -191,8 +218,16 @@ ui <- dashboardPage(
                     buildQuestionnaireUI(commands[commands$Dimension=='Dimension 3: Impact',])
             ),
             tabItem(tabName = "download",
-                    h2("Download selected questionnaire answers"),
-                    questionnaireDownloadUI("downloadedAnswers", "Download OH-EpiCap profile (.csv or .rds format)")
+                    h2("Save questionnaire answers to file"),
+                    box(width=12,
+                        p("(Partially) completed questionnaires can be saved to file here, allowing the user to revisit or complete their answers at a later time.",
+                          br(),
+                          "Files can be saved in either .rds (machine-readable) or .csv (human-readable) format.",
+                          br(),
+                          br(),
+                          "To upload a saved file and revisit the questionnaire answers, navigate to the 'Upload answers from file' page (under the Questionnaire tab in the sidebar).")
+                        ),
+                    questionnaireDownloadUI("downloadedAnswers", "Download OH-EpiCap questionnaire answers (.csv or .rds format)")
             ),       
             tabItem(tabName = "results", resultsOutput("resultsPage")),
             tabItem(tabName = "benchmark", benchmarkUI("benchmarkPage",ref_datasets=ref_datasets))

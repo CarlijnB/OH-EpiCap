@@ -53,14 +53,14 @@ benchmarkUI <- function(id, label = "benchmark", ref_datasets) {
     h2("Compare your OH-EpiCap profile with a reference dataset"),
     fluidRow(
       box(width=12,
-          p("This page allows the user to visually compare the completed or uploaded OH-EpiCap profile to a selected reference dataset")
+          p("This page allows the user to visually compare the completed or uploaded OH-EpiCap profile to a selected reference dataset.")
       )),
     fluidRow(
       box(width=12,
           title="Reference dataset",
           solidHeader=TRUE, status="danger",
           collapsible=TRUE, collapsed=FALSE,
-          fluidRow(column(6, selectInput(inputId = ns("selected_ref"), label = "Select a reference dataset",choices=c("Select a reference dataset", ref_datasets), selectize=TRUE)),
+          fluidRow(column(6, selectInput(inputId = ns("selected_ref"), label = "Please select a reference dataset",choices=c("Select a reference dataset", ref_datasets), selectize=TRUE)),
                    column(6, textOutput(ns("bmtxt_refdata"))))
       )),
     fluidRow(
@@ -70,8 +70,10 @@ benchmarkUI <- function(id, label = "benchmark", ref_datasets) {
           collapsible=TRUE, collapsed=FALSE,
           fluidRow(
             column(6,
-                   p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Users are encouraged to hover over plotted data points to view breakdowns of scores."),
-                   textOutput(ns("bmtxt_targets"))),
+                   p("This section shows the comparison between the completed/uploaded OH-EpiCap profile and the selected reference dataset, across the twelve targets."),
+                   p("The lightly coloured area depicts the interquartile range (IQR) of the relevant target score in the reference dataset, with the + symbol indicating the median."),
+                   p("If a data point (filled circle) falls within the coloured area, the target score from the OH-EpiCap profile is within the range of the benchmark target."),
+                   uiOutput(ns("bmtxt_targets"))),
                    column(6, girafeOutput(ns("benchmark_all"))))
       )),
     fluidRow(
@@ -81,8 +83,10 @@ benchmarkUI <- function(id, label = "benchmark", ref_datasets) {
           collapsible=TRUE, collapsed=TRUE,
           fluidRow(
             column(6, 
-                   p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
-                   textOutput(ns("bmtxt_dim1"))),
+                   p("This section shows the comparison between the completed/uploaded OH-EpiCap profile and the selected reference dataset, across the indicators of Dimension 1 (Organization)."),
+                   p("The lightly coloured area depicts the interquartile range (IQR) of the relevant indicator score in the reference dataset, with the + symbol indicating the median."),
+                   p("If a data point (filled circle) falls within the coloured area, the indicator score from the OH-EpiCap profile is within the range of the benchmark target."),
+                   uiOutput(ns("bmtxt_dim1"))),
             column(6, girafeOutput(ns("benchmark_1"))))
       )),
     fluidRow(
@@ -92,8 +96,10 @@ benchmarkUI <- function(id, label = "benchmark", ref_datasets) {
           collapsible=TRUE, collapsed=TRUE,
           fluidRow(
             column(6, 
-                   p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
-                   textOutput(ns("bmtxt_dim2"))),
+                   p("This section shows the comparison between the completed/uploaded OH-EpiCap profile and the selected reference dataset, across the indicators of Dimension 2 (Operations)."),
+                   p("The lightly coloured area depicts the interquartile range (IQR) of the relevant indicator score in the reference dataset, with the + symbol indicating the median."),
+                   p("If a data point (filled circle) falls within the coloured area, the indicator score from the OH-EpiCap profile is within the range of the benchmark target."),                   
+                   uiOutput(ns("bmtxt_dim2"))),
             column(6, girafeOutput(ns("benchmark_2"))))
       )),
     fluidRow(
@@ -103,8 +109,10 @@ benchmarkUI <- function(id, label = "benchmark", ref_datasets) {
           collapsible=TRUE, collapsed=TRUE,
           fluidRow(
             column(6,
-                   p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
-                   textOutput(ns("bmtxt_dim3"))),
+                   p("This section shows the comparison between the completed/uploaded OH-EpiCap profile and the selected reference dataset, across the indicators of Dimension 3 (Impact)."),
+                   p("The lightly coloured area depicts the interquartile range (IQR) of the relevant indicator score in the reference dataset, with the + symbol indicating the median."),
+                   p("If a data point (filled circle) falls within the coloured area, the indicator score from the OH-EpiCap profile is within the range of the benchmark target."),                   
+                   uiOutput(ns("bmtxt_dim3"))),
             column(6, girafeOutput(ns("benchmark_3"))))
       )),
   )
@@ -125,12 +133,22 @@ benchmarkServer <- function(id, scores_targets=scores_targets, scores_indicators
       output$benchmark_1 <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[1:20,],4,ref_indic()[1:16,]))
       output$benchmark_2 <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[21:40,],4,ref_indic()[17:32,]))
       output$benchmark_3 <- renderGirafe(makeRadarPlot_benchmark(scores_indicators()[41:60,],4,ref_indic()[33:48,]))
+      #lists of targets/indicators with low scores
+      source("R/scoringHelpers.R")
+      targets_low<-id_low_scores(scores_targets(),ref_targets()$low)
+      targets_high<-id_high_scores(scores_targets(),ref_targets()$high)
+      dim1_low<-id_low_scores(scores_indicators()[1:20,],ref_indic()[1:16,]$low)
+      dim1_high<-id_high_scores(scores_indicators()[1:20,],ref_indic()[1:16,]$high)
+      dim2_low<-id_low_scores(scores_indicators()[21:40,],ref_indic()[17:32,]$low)
+      dim2_high<-id_high_scores(scores_indicators()[21:40,],ref_indic()[17:32,]$high)
+      dim3_low<-id_low_scores(scores_indicators()[41:60,],ref_indic()[33:48,]$low)
+      dim3_high<-id_high_scores(scores_indicators()[41:60,],ref_indic()[33:48,]$high)
       #generate benchmark texts
-      output$bmtxt_refdata <- renderText({"Sample text on reference dataset. Foo"})
-      output$bmtxt_targets <- renderText({"Sample text on comparison of targets to reference dataset"})
-      output$bmtxt_dim1 <- renderText({"Sample text on comparison of Dimension 1 to reference dataset"})
-      output$bmtxt_dim2 <- renderText({"Sample text on comparison of Dimension 2 to reference dataset "})
-      output$bmtxt_dim3 <- renderText({"Sample text on comparison of Dimension 3 to reference dataset"})
+      output$bmtxt_refdata <- renderText({"Sample text describing the reference dataset"})
+      output$bmtxt_targets <- renderUI({HTML(paste0("Targets exceeding the benchmark range, are: ",targets_high(),".<br><br>Targets falling below the benchmark range, are: ",targets_low(),"."))})
+      output$bmtxt_dim1 <- renderUI({HTML(paste0("Indicators exceeding the benchmark range, are: ",dim1_high(),".<br><br>Indicators falling below the benchmark range, are: ",dim1_low(),"."))})
+      output$bmtxt_dim2 <- renderUI({HTML(paste0("Indicators exceeding the benchmark range, are: ",dim2_high(),".<br><br>Indicators falling below the benchmark range, are: ",dim2_low(),"."))})
+      output$bmtxt_dim3 <- renderUI({HTML(paste0("Indicators exceeding the benchmark range, are: ",dim3_high(),".<br><br>Indicators falling below the benchmark range, are: ",dim3_low(),"."))})
       }
   )    
 }

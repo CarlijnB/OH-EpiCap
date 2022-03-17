@@ -6,10 +6,14 @@ resultsOutput <- function(id, label = "results") {
   ns <- NS(id)
   
   tagList(
-    h2("Visualise your OH-EpiCap profile"),
+    h2("Results: Visualise your OH-EpiCap profile"),
     fluidRow(
       box(width=10,
-          p("This page visually summarises the interactively completed, or uploaded, OH-EpiCap profile.")
+          p("This page visually summarises an interactively completed, or uploaded, OH-EpiCap profile.",
+            br(),
+            "This page can also be downloaded in report form by clicking the 'Download report' button to the right.",
+            br(),
+            "The report is in HTML format, and includes interactive visualisations.")
        ),
       downloadButton(ns("report"), "Download report",width=2)
       ),
@@ -19,8 +23,8 @@ resultsOutput <- function(id, label = "results") {
            title="OH-EpiCap Index and Dimensions",
            solidHeader=TRUE, status="success",
            collapsible=TRUE, collapsed=FALSE,
-           p("OH-EpiCap and Dimension indices represent mean scores over all component questions, expressed as percentages."),
-           textOutput(ns("restxt_overall")),
+           p("OH-EpiCap and Dimension indices represent mean scores over all questions, expressed as a percentage."),
+           #textOutput(ns("restxt_overall")),
            fluidRow(column(4),
                     gaugeOutput(ns("indexGauge")),
                     column(4)),
@@ -33,10 +37,14 @@ resultsOutput <- function(id, label = "results") {
             title="Targets",
             solidHeader=TRUE, status="info",
             collapsible=TRUE, collapsed=FALSE,
-            p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Users are encouraged to hover over plotted data points to view breakdowns of scores."),
-            textOutput(ns("restxt_targets")),
+            p("This section shows the results of the twelve targets, divided across the three dimensions.",
+              br(),
+              "Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be beneficial.",
+              br(),
+              "Users are encouraged to hover over data points to view a breakdown of each target score."),
             fluidRow(column(6, girafeOutput(ns("lollipop_tar"))),
-                     column(6, girafeOutput(ns("radar_all"))))
+                     column(6, girafeOutput(ns("radar_all")))),
+            uiOutput(ns("restxt_targets")),
             )),
       fluidRow(
         box(width=12,
@@ -44,9 +52,11 @@ resultsOutput <- function(id, label = "results") {
             solidHeader=TRUE, status="warning",
             collapsible=TRUE, collapsed=TRUE,
             fluidRow(
-              column(6, 
-                     p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
-                     textOutput(ns("restxt_dim1"))),
+              column(6,
+                     p("This section shows the results across all indicators within the four targets of Dimension 1 (Organization)."),
+                     p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be beneficial."),
+                     p("Indicators labelled in grey indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with a particular question."),
+                     uiOutput(ns("restxt_dim1"))),
               column(6, girafeOutput(ns("radar_1"))))
             )),
       fluidRow(
@@ -55,9 +65,11 @@ resultsOutput <- function(id, label = "results") {
             solidHeader=TRUE, status="primary",
             collapsible=TRUE, collapsed=TRUE,
             fluidRow(
-              column(6, 
-                     p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
-                     textOutput(ns("restxt_dim2"))),
+              column(6,
+                     p("This section shows the results across all indicators within the four targets of Dimension 2 (Operations)."),
+                     p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be beneficial."),
+                     p("Indicators labelled in grey indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with a particular question."),
+                     uiOutput(ns("restxt_dim2"))),
               column(6, girafeOutput(ns("radar_2"))))
             )),
       fluidRow(
@@ -67,8 +79,10 @@ resultsOutput <- function(id, label = "results") {
             collapsible=TRUE, collapsed=TRUE,
             fluidRow(
               column(6,
-                     p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be required. Greyed-out Indicators labels indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with particular questions."),
-                     textOutput(ns("restxt_dim3"))),
+                     p("This section shows the results across all indicators within the four targets of Dimension 3 (Impact)."),
+                     p("Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be beneficial."),
+                     p("Indicators labelled in grey indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with a particular question."),
+                     uiOutput(ns("restxt_dim3"))),
               column(6, girafeOutput(ns("radar_3"))))
             ))
     )
@@ -107,13 +121,36 @@ resultsServer <- function(id, scores_targets=scores_targets, scores_indicators=s
       radreactive_3 <- reactive({makeRadarPlot_results(scores_indicators()[41:60,],4)})
       output$radar_3 <- renderGirafe(radreactive_3())
 
+      #lists of targets/indicators with low scores
+      source("R/scoringHelpers.R")
+      targets_low<-id_low_scores(scores_targets())
+      targets_high<-id_high_scores(scores_targets())
+      dim1_low<-id_low_scores(scores_indicators()[1:20,])
+      dim1_high<-id_high_scores(scores_indicators()[1:20,])
+      dim2_low<-id_low_scores(scores_indicators()[21:40,])
+      dim2_high<-id_high_scores(scores_indicators()[21:40,])
+      dim3_low<-id_low_scores(scores_indicators()[41:60,])
+      dim3_high<-id_high_scores(scores_indicators()[41:60,])
+
       #generate result texts
-      output$restxt_overall <- renderText(restxt_overall_reactive())
-      restxt_overall_reactive <- reactive({"Sample text. Foo"})
-      output$restxt_targets <- renderText({"Sample text. Best Dim score is"})
-      output$restxt_dim1 <- renderText({"Sample text. Best Target score is "})
-      output$restxt_dim2 <- renderText({"Sample text. Best Target score is "})
-      output$restxt_dim3 <- renderText({"Sample text. Best Target score is "})
+      #restxt_overall_reactive <- reactive({"Sample text. Foo"})
+      #output$restxt_overall <- renderText(restxt_overall_reactive())
+      restxt_targets_reactive <- reactive({HTML(paste0("Targets demonstrating <b>good adherence</b> to One Health principles are: <b>", targets_high(), "</b>.<br>",
+                                                       "Targets that would <b>most benefit from improvement</b> are: <b>",targets_low(), "</b>."
+      ))})
+      output$restxt_targets <- renderUI({restxt_targets_reactive()})
+      restxt_dim1_reactive <- reactive({HTML(paste0("Indicators demonstrating <b>good adherence</b> to One Health principles are: <b>", dim1_high(), "</b>.<br><br>",
+                                                    "Indicators that would <b>most benefit from improvement</b> are: <b>",dim1_low(), "</b>."
+      ))})
+      output$restxt_dim1 <- renderUI({restxt_dim1_reactive()})
+      restxt_dim2_reactive <- reactive({HTML(paste0("Indicators demonstrating <b>good adherence</b> to One Health principles are: <b>", dim2_high(), "</b>.<br><br>",
+                                                    "Indicators that would <b>most benefit from improvement</b> are: <b>",dim2_low(), "</b>."
+      ))})
+      output$restxt_dim2 <- renderUI({restxt_dim2_reactive()})
+      restxt_dim3_reactive <- reactive({HTML(paste0("Indicators demonstrating <b>good adherence</b> to One Health principles are: <b>", dim3_high(), "</b>.<br><br>",
+                                                    "Indicators that would <b>most benefit from improvement</b> are: <b>",dim3_low(), "</b>."
+      ))})
+      output$restxt_dim3 <- renderUI({restxt_dim3_reactive()})
  
       #generate automatic report , from https://shiny.rstudio.com/articles/generating-reports.html
       output$report <- downloadHandler(
