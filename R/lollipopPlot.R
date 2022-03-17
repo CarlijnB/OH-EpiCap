@@ -13,7 +13,7 @@ setupLollipopPlot<-function(max_score=4){
       panel.border = element_blank(),
       axis.ticks.x = element_blank()
     ) +
-    ylab("EU-EpiCap score") +
+    ylab("OH-EpiCap score") +
     scale_y_continuous(breaks=seq(1,max_score,1),minor_breaks=NULL,limits=c(1,max_score))
 }
 
