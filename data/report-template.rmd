@@ -9,46 +9,54 @@ library(flexdashboard)
 ```
 
 ## OH-EpiCap Index and Dimensions
-```{r overall-text}
-restxt_overall_reactive()
-```
+OH-EpiCap and Dimension indices represent mean scores over all questions, expressed as a percentage.
 
 <div class = "row">
-<div class = "col-md-4">
+<div class = "col-md-3 col-md-offset-3" style="height: 150px;">
 </div>
-<div class = "col-md-4">
+<div class = "col-md-3" style="height: 150px;">
+<div class="pull-right">
 ```{r index-gauge}
 g_index()
 ```
 </div>
-<div class = "col-md-4">
+</div>
+<div class = "col-md-3" style="height: 150px;">
 </div>
 </div>
 
 <div class = "row">
-<div class = "col-md-4">
+<div class = "col-md-3 col-md-offset-3" style="height: 150px;">
+<div class="pull-right">
 ```{r dim1-gauge}
 g_org()
 ```
 </div>
-<div class = "col-md-4">
+</div>
+<div class = "col-md-3" style="height: 150px;">
+<div class="pull-right">
 ```{r dim2-gauge}
 g_ope()
 ```
 </div>
-<div class = "col-md-4">
+</div>
+<div class = "col-md-3" style="height: 150px;">
+<div class="pull-right">
 ```{r dim3-gauge}
 g_imp()
 ```
 </div>
 </div>
-
+</div>
 
 ## Targets
-<div class = "row">
+This section shows the results of the twelve targets, divided across the three dimensions.<br><br>
+Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be beneficial.<br><br>
+Users are encouraged to hover over data points to view a breakdown of each target score.
+<div class = "row" height="150 px">
 <div class = "col-md-6">
 <center>
-```{r target-lollipop, out.width="50%"}
+```{r target-lollipop}
 lollipop<-print(lollipopreactive_tar())
 lollipop
 ```
@@ -57,21 +65,22 @@ lollipop
 
 <div class = "col-md-6">
 <center>
-```{r target-radar, out.width="50%"}
-r_all<-print(radreactive_all(),width=0.5)
+```{r target-radar}
+r_all<-print(radreactive_all())
 r_all
 ```
 </center>
 </div>
 </div>
+`r restxt_targets_reactive()`
 
 ## Dimension 1: Organization
 <div class = "row">
 <div class = "col-md-6">
-<center>
-```{r dim1-text}
-```
-</center>
+This section shows the results across all indicators within the four targets of Dimension 1 (Organization).<br><br>
+Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be beneficial.<br><br>
+Indicators labelled in grey indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with a particular question.<br><br>
+`r restxt_dim1_reactive()`
 </div>
 <div class = "col-md-6">
 <center>
@@ -86,10 +95,10 @@ r1
 ## Dimension 2: Operations
 <div class = "row">
 <div class = "col-md-6">
-<center>
-```{r dim2-text}
-```
-</center>
+This section shows the results across all indicators within the four targets of Dimension 2 (Operations).<br><br>
+Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be beneficial.<br><br>
+Indicators labelled in grey indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with a particular question.<br><br>
+`r restxt_dim2_reactive()`
 </div>
 <div class = "col-md-6">
 <center>
@@ -104,10 +113,10 @@ r2
 ## Dimension 3: Impact
 <div class = "row">
 <div class = "col-md-6">
-<center>
-```{r dim3-text}
-```
-</center>
+This section shows the results across all indicators within the four targets of Dimension 3 (Impact).<br><br>
+Scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be beneficial.<br><br>
+Indicators labelled in grey indicate a question was answered with NA. Users are encouraged to hover over plotted data points to view the wording of the chosen indicator level, and any comments that may have been added in connection with a particular question.<br><br>
+`r restxt_dim3_reactive()`
 </div>
 <div class = "col-md-6">
 <center>
