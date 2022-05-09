@@ -6,7 +6,7 @@ library(shinyjs)
 library(flexdashboard)
 
 
-setupApp(questionnaire_file = "data/EU-EpiCap_Questionnaire_22_03_16.xlsx")
+setupApp(questionnaire_file = "data/EU-EpiCap_Questionnaire_22_05_09.xlsx")
 
 # User interface ----------------------------------------------------------
 
