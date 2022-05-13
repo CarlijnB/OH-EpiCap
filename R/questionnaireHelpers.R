@@ -70,7 +70,7 @@ readQuestionnaire <- function(datafile) {
     select(-sheet)
   
   #Split up "Possible Answers" (one long string) into character vector "Options" with separate options, based on new line character
-  questionnaire$Options <- strsplit(questionnaire$`Possible answers`,"\r\n")
+  questionnaire$Options <- strsplit(questionnaire$`Possible answers`,"(\r)*\n")
   questionnaire <- select(questionnaire,-`Possible answers`)
   
   #Split up "Questions" into "Question" and "Notes"
