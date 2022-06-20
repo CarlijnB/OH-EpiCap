@@ -53,7 +53,9 @@ ui <- dashboardPage(
             menuItem("Results", tabName = "results", icon = icon("chart-pie")
                      ),
             menuItem("Benchmark", tabName = "benchmark", icon = icon("copy")
-                     )
+                     ),
+            menuItem("Glossary", tabName = "glossary", icon = icon("book")
+            )
         )
     ),
     
@@ -143,7 +145,8 @@ ui <- dashboardPage(
                         tags$li("Benchmarking tool to compare to other One Health Surveillance systems"),
                         ),
                     br(),
-                    p(tags$b("Disclaimer:"),"Here we present a functional 'beta' version of the tool, that is still under development. Therefore, expect placeholder text in some areas and a work-in-progress user interface. Feedback on the tool is welcome, you can e-mail this to Dr. Joaquin Prada (j.prada@surrey.ac.uk)."),
+                    p(tags$b("Disclaimer:"),"Here we present a functional 'beta' version of the tool, that is still under development. Therefore, expect placeholder text in some areas and a work-in-progress user interface.",
+                    tags$b("Please note that this version of the OH-EpiCap tool times out after 30 min of inactivity."), "To avoid data loss, you must save your data regularly using the 'Save answers to file' option. Feedback on the tool is welcome, you can e-mail this to Dr. Joaquin Prada (j.prada@surrey.ac.uk)."),
                     br(),
                     p("The OH-EpiCap tool has been developed by the MATRIX consortium, an integrative project funded by the One Health European Joint Programme. The MATRIX consortium aims to advance the implementation of OHS in practice by building onto existing resources, adding value to them and creating synergies among the sectors at the national level.  One activity has been the development of the generic benchmarking tool presented here, for characterizing, monitoring and evaluating epidemiological surveillance capacities and capabilities, which directly contribute to OHS. The tool aims to identify and describe the collaborations among actors involved in the surveillance of a hazard and to characterize the OH-ness of the surveillance system. The tool will support identification of areas that could lead to improvements in existing OH surveillance capacities. "),
                     br(),
@@ -153,7 +156,9 @@ ui <- dashboardPage(
                         tags$li("Dimension 2: Operations"),
                         tags$li("Dimension 3: Impact"),
                     ),
-                    p("The OH-EpiCap questionnaire can be completed by answering the questions on each of the individual Dimension pages (under the Questionnaire tab in the sidebar).")
+                    p("The OH-EpiCap questionnaire can be completed by answering the questions on each of the individual Dimension pages (under the Questionnaire tab in the sidebar)."),
+                    p("In each question, scores range 1-4, with higher values suggesting better adherence to the One Health principle (better integration of sectors), and lower values suggesting improvements may be beneficial. It is possible that the answers proposed for a question do not fit the OH surveillance system under evaluation; in this case, the panel of surveillance representatives should define what would be the ideal situation regarding this question for the OH surveillance system under evaluation and score the question accordingly by comparing the current situation to the ideal one. We recommend the panel to indicate in the comment space under the question which alternative answer(s) they considered."),
+                    p("The value 'Not Applicable (NA)' can be used if the indicator is not relevant to the OH surveillance system under evaluation.")
             ),
             #tabItem(tabName = "network",
             #        h2("Explore your surveillance network here")
@@ -230,7 +235,8 @@ ui <- dashboardPage(
                     questionnaireDownloadUI("downloadedAnswers", "Download OH-EpiCap questionnaire answers (.csv or .rds format)")
             ),       
             tabItem(tabName = "results", resultsOutput("resultsPage")),
-            tabItem(tabName = "benchmark", benchmarkUI("benchmarkPage",ref_datasets=ref_datasets))
+            tabItem(tabName = "benchmark", benchmarkUI("benchmarkPage",ref_datasets=ref_datasets)),
+            tabItem(tabName = "glossary", glossaryOutput())
         )    
     )
 )

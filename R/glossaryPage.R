@@ -1,0 +1,45 @@
+# Module UI function
+glossaryOutput <- function() {
+  tagList(
+    h2("Glossary"),
+    fluidRow(box(width=10, p("This page provides definitions for the most relevant terms used within the OH-EpiCap tool"))),
+    p(tags$b("Actor:"),"An individual or organization that operates with a primary intent to improve health of people, animals and the environment."),
+    p(tags$b("Central/Intermediate/Field levels"),a(href="#Dufour","(Dufour et al., 2009)"),tags$b(":"),
+      tags$ul(
+        tags$li(tags$b("Central level"),"in a One Health (OH) surveillance system is the level of management. It consists of the highest-ranking executive, whose primary responsibilities include making major decisions, managing the overall operations and resources, overseeing the goals, policies, and procedures of the surveillance and collaborations. Their main priority is on the strategic planning and execution of the overall surveillance success."),
+        tags$li(tags$b("Intermediate level"), "of leadership in OH surveillance is a middle level of a hierarchical organization that is subordinate to the executive management and responsible for 'team leading' and line managing. Intermediate level is between the field and the central unit. Their role is to coordinate activities in the field, and to validate, and if necessary correct, the data collected before they are sent to the central unit."),
+        tags$li(tags$b("Field (or local) level"), "is primarily concerned with the execution of day-to-day work.")
+      )),
+    p(tags$b("Corrective measure:"),"An action to eliminate the cause of a detected nonconformity or other undesirable situations."),
+    p(tags$b("Data warehouse:"),"Central repository of integrated data from one or more sources in a single place. A data warehouse stores current and historical data that is used for query and analysis (", 
+        tags$a(href="https://web.archive.org/web/20180726071809/https://spotlessdata.com/blog/exploring-data-warehouses-and-data-quality","Spotless Data: Exploring data warehouses and data quality [Internet archive]"),";",
+        tags$a(href="https://docs.oracle.com/cd/B10501_01/server.920/a96520/concept.htm#43555","Oracle9i Data Warehousing Guide"), ")."),
+    p(tags$b("Epidemiological surveillance:"),"Observational method based on continuous recording to follow health status or risk factors in a defined population, and particularly to detect the appearance of pathological processes and study their development over time and in space, with a view to adopting appropriate control measures", a(href="#Dufour","(Dufour et al., 2009)"),"."),
+    p(tags$b("End user:"),"The person who receives and ultimately uses a product", a(href="#WHO","(WHO, 2021)"), "."),
+    p(tags$b("FAIR Data:"),"The FAIR data principles are a set of guiding principles in order to make data findable, accessible, interoperable and reusable", a(href="#Wilkinson","(Wilkinson et al., 2016)"), "."),
+    p(tags$b("One Health (OH):"),"Multisectoral and multidisciplinary approach ensuring communication, collaboration, and coordination among all relevant ministries, agencies, stakeholders, sectors, and disciplines working locally, nationally, and globally to attain optimal health for people, animals, and our environment (", a(href="https://extranet.who.int/sph/one-health-operations","WHO: One Health Operations"),")."),
+    p(tags$b("One Health network:"),"Defined as an engagement between two or more discrete actors with at least two of the following sectors represented: animal health, human health, and the environment or ecosystem", a(href="#Khan","(Khan et al., 2018)"), "."),
+    p(tags$b("One Health surveillance / Integrated surveillance:"),"The systematic collection, validation, analysis, interpretation of data, and dissemination of information collected on humans, animals, and the environment to inform decisions for more effective evidence- and system-based health interventions (", a(href="#Aenishaenslin", "Aenishaenslin et al., 2021"), ";", a(href="#Stärk", "Stärk et al., 2015"),")."),
+    p(tags$b("One Health surveillance system:"),"System in which collaborative efforts exist across at least two sectors (among human health, animal health, food safety and environment) in the surveillance process to produce and disseminate information with a purpose to improve any of human, animal or environmental health (", a(href="#Dufour","Dufour et al., 2009"),";", a(href="https://aginfra.d4science.org/catalogue-aginfra?path=/dataset/75-b4503888-5b0c-4a15-8efc-342a6ea4591b","ORION Knowledge Hub: OHEJP Glossary"),")."),
+    p(tags$b("One Health team:"),"Consists of members of different disciplines, and sectors working collaboratively, to set goals, make decisions and share resources and responsibilities to achieve better health outcomes for human, animal and the environment."),
+    p(tags$b("Outcome:"),"the level of performance or achievement that occurred because of the integrative effort of multiple disciplines working to attain optimal health for people, animals, and the environment and it is a benefit that the integrative is designed to deliver. Expected outcomes in a OH surveillance system include the information resulting from the surveillance effort, which is then used for decision-making, policy development, and action."),
+    p(tags$b("Output:"),"immediate product resulting from surveillance. OH surveillance outputs provide information (e.g. tables or graphs showing counts or rates of cases/events, or proportional morbidity or mortality, categorized by demographic, geographic or other risk factors)  for those responsible for taking the control and prevention action."),
+    p(tags$b("Stakeholders:"),"the ultimate beneficiaries (i.e. animals, people and the environment) and the organisations that work to protect them (i.e. research institutes, government ministries, international organisations and professional bodies)", a(href="#Dufour","(Dufour et al., 2009)"),"."),
+    p(tags$b("Steering Committee:"),"The One Health surveillance Steering Committee will assume the overall coordination and oversight regarding the implementation of the surveillance. The committee will be composed of representatives from all sectors involved in the One Health surveillance. It will be responsible for the overall governance including establishing strategies, prioritizing funding allocations and mobilizing resources for one health. The members of these committees should have appropriate expertise, clearly defined roles and responsibilities; these members should hold meetings (with minutes taken and kept) regularly to oversee the function of the system."),
+    p(tags$b("Surveillance system/network:"),"All individuals or agencies organised to ensure surveillance in a given region of one or more pathological entities constitute an epidemiological surveillance network", a(href="#Toma","(Toma et al., 1991)"),"."),
+    p(tags$b("Sustainable:"),"The robustness and ability of the system to be ongoing in the long term."),
+    p(tags$b("Traceable:"),"Able to be followed on its course 'when, where and by whom was produced.'"),
+    br(),
+    h3("References"),
+    div(id="Aenishaenslin",p("Aenishaenslin, C., Häsler, B., Ravel, A., Parmley, E. J., Mediouni, S., Bennani, H., Stärk, K. D. C. & Buckeridge, D. L. (2021). Evaluating the Integration of One Health in Surveillance Systems for Antimicrobial Use and Resistance: A Conceptual Framework. Frontiers in veterinary science, 8, 169.")),
+    div(id="Dufour",p("Dufour, B., & Hendrikx, P. (2009). Epidemiological surveillance in animal health. Association pour l'Étude de l'Épidémiologie des Maladies Animales. 2nd éd.")),
+    div(id="Khan",p("Khan, M. S., Rothman-Ostrow, P., Spencer, J., Hasan, N., Sabirovic, M., Rahman-Shepherd, A., Shaikh, N., Heymann, D.L. & Dar, O. (2018). The growth and strategic functioning of One Health networks: a systematic analysis. The lancet Planetary health, 2(6), e264-e273.")),
+    div(id="Stärk",p("Stärk, K. D., Kuribreña, M. A., Dauphin, G., Vokaty, S., Ward, M. P., Wieland, B., & Lindberg, A. (2015). One Health surveillance–more than a buzz word? Preventive Veterinary Medicine, 120(1), 124-130.")),
+    div(id="Toma",p("Toma B, Bénet J-J, Dufour B, Eloit M, Moutou F, Sanaa M. Glossaire d’épidémiologie animale. Le Point vétérinaire, Maisons-Alfort. 1991; 365.")),
+    div(id="Wilkinson",p("Wilkinson, M.D., Dumontier, M., Aalbersberg, I.J., Appleton, G., Axton, M., Baak, A., Blomberg, N., Boiten, J.W., da Silva Santos, L.B., Bourne, P.E., Bouwman, J., et al. 2016. The FAIR Guiding Principles for scientific data management and stewardship. Scientific data, 3(1), 1-9.")),
+    div(id="WHO",p("World Health Organization (2021). Expert consultation on public health needs related to surveillance of SARS-CoV-2 in wastewater: summary report: virtual meeting, 30 November 2020 (No. WHO/EURO: 2021-1965-41716-57097). World Health Organization. Regional Office for Europe."))
+    )
+}
+
+  
+  
